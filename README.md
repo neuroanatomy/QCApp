@@ -3,7 +3,7 @@ Fast visual quality control tool for segmented structures volumetry from FreeSur
 
 The application relies on Apache Commons libraries which can be easily downloaded with Apache Maven. The interface looks like this:
 
-![Screenshot](/images/QCAPP.png)
+![Screenshot](/images/QCApp.png)
 
 How to use it:
 
