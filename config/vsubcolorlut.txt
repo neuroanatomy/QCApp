@@ -1,0 +1,17 @@
+#No. Label Name:                    R   G   B A 
+                                               
+10   Left-Thalamus-Proper         127   0   0 0
+11   Left-Caudate                 127   0 127 0
+12   Left-Putamen                 127   0 255 0
+13   Left-Pallidum                127 127   0 0
+16   Brain-Stem+4th-Ventri        255 255 127 0
+17   Left-Hippocampus             127 255   0 0
+18   Left-Amygdala                255 127 127 0
+26   Left-Accumbens-area          127 255 255 0
+49   Right-Thalamus-Proper          0 127   0 0
+50   Right-Caudate                  0 127 127 0
+51   Right-Putamen                  0 127 255 0
+52   Right-Pallidum               127 127 255 0
+53   Right-Hippocampus            255 127   0 0
+54   Right-Amygdala               127 255 127 0
+58   Right-Accumbens-area         255 127 255 0

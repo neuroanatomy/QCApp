@@ -1,0 +1,5 @@
+/target/
+/bin/
+/QCApp.jar
+/pom2.xml
+.DS_Store

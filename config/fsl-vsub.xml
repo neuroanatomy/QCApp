@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <colorLUT>vsubcolorlut.txt</colorLUT>
+    <images>
+        <image>
+            <volume>T1_subcort_seg.nii.gz</volume>
+            <color>true</color>
+            <effect>3D</effect>
+            <output>T1_vsub</output>
+            <volback>T1_biascorr.nii.gz</volback>
+        </image>
+        <image>
+            <volume>T1_subcort_seg.nii.gz</volume>
+            <color>true</color>
+            <effect>2D</effect>
+            <output>T1_vsub</output>
+            <volback>T1_biascorr.nii.gz</volback>
+        </image>
+        <image>
+            <volume>T1_biascorr.nii.gz</volume>
+            <color>false</color>
+            <effect>2D</effect>
+            <output>T1_biascorr</output>
+        </image>
+    </images>
+    <stats>
+    	<file>T1_vsub.stats</file>
+    	<measures>
+    		<measure>BrainVol</measure>
+    		<measure>ICV</measure>
+    		<measure>GreyMatter</measure>
+    		<measure>WhiteMatter</measure>
+    	</measures>
+    </stats>
+    <qcfile>qc-vsub.txt</qcfile>
+</configuration>

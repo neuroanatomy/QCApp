@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <colorLUT>vlobcolorlut.txt</colorLUT>
+    <images>
+        <image>
+            <volume>T1_vlob.nii.gz</volume>
+            <color>true</color>
+            <effect>2D</effect>
+            <output>T1_vlob</output>
+            <volback>T1_biascorr.nii.gz</volback>
+        </image>
+        <image>
+            <volume>T1_biascorr.nii.gz</volume>
+            <color>false</color>
+            <effect>2D</effect>
+            <output>T1_biascorr</output>
+        </image>
+    </images>
+    <stats>
+    	<file>T1_vlob.stats</file>
+    	<measures>
+    		<measure>BrainVol</measure>
+    		<measure>ICV</measure>
+    		<measure>GreyMatter</measure>
+    		<measure>WhiteMatter</measure>
+    	</measures>
+    </stats>
+    <qcfile>qc-vlob.txt</qcfile>
+</configuration>

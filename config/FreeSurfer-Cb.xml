@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <colorLUT>CbColorLUT.txt</colorLUT>
+    <images>
+        <image>
+            <volume>mri/aseg.mgz</volume>
+            <color>true</color>
+            <effect>2D</effect>
+            <output>aseg</output>
+            <volback>mri/orig.mgz</volback>
+        </image>
+        <image>
+            <volume>mri/brain.mgz</volume>
+            <color>false</color>
+            <effect>2D</effect>
+            <output>brain</output>
+        </image>
+        <image>
+            <volume>mri/orig.mgz</volume>
+            <color>false</color>
+            <effect>2D</effect>
+            <output>orig</output>
+        </image>
+    </images>
+    <stats>
+    	<file>stats/aseg.stats</file>
+    	<measures>
+    		<measure>BrainSeg</measure>
+    		<measure>eTIV</measure>
+    		<measure>CortexVol</measure>
+    		<measure>CorticalWhiteMatter</measure>
+    	</measures>
+    </stats>
+    <qcfile>qc-fscb.txt</qcfile>
+</configuration>

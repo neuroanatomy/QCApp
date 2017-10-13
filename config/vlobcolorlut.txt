@@ -1,0 +1,22 @@
+#No. Label Name:                       R   G   B A 
+                                                  
+1    Right-Frontal-GM                  94 152 212 0
+2    Right-Parietal-GM                147 186  55 0
+3    Right-Occipital-GM               165  72 186 0
+4    Right-Temporal-GM                 77 188  95 0
+5    Right-Ventricles+Th+Pons+Cb-GM   218 115 214 0
+11   Left-Frontal-GM                121 162  77 0
+12   Left-Parietal-GM               102 107 215 0
+13   Left-Occipital-GM              206 168  55 0
+14   Left-Temporal-GM               121  89 156 0
+15   Left-Ventricles+Th+Pons+Cb-GM  208  79  42 0
+21   Right-Frontal-WM                  81 181 155 0
+22   Right-Parietal-WM                211  64  87 0
+23   Right-Occipital-WM                75 113  51 0
+24   Right-Temporal-WM                201  71 137 0
+25   Right-Ventricles+Th+Pons+Cb-WM   173 153  83 0
+31   Left-Frontal-WM                196 140 202 0
+32   Left-Parietal-WM               224 139  75 0
+33   Left-Occipital-WM              165  79  81 0
+34   Left-Temporal-WM               148  97  41 0
+35   Left-Ventricles+Th+Pons+Cb-WM  230 131 140 0
