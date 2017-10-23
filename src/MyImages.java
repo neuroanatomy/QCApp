@@ -93,6 +93,7 @@ class MyImages extends JComponent {
 	}
 	
 	public void renew() {
+		float opacity = 0;
 		cmap = new int[2][256];
 		
 		// init greyscale colourmap
@@ -116,10 +117,18 @@ class MyImages extends JComponent {
 			String effect = config.getString("effect");
 			String output = config.getString("output");
 			String volback = config.getString("volback");
+			try {
+				opacity = config.getFloat("opacity");
+			}
+			catch (Exception e) {
+				opacity = 1f;
+			}
+			if (opacity <= 0 || opacity > 1)
+				opacity = 1f;
 			if (color && segVolume == null)
 				segVolume = volume;
 			for (int plane = 0; plane < 3; plane++) {
-				imgList[j] = new MyImage(volume, color, effect, output, volback, plane);
+				imgList[j] = new MyImage(volume, color, effect, output, volback, plane, opacity);
 				j++;
 			}
 		}
@@ -503,7 +512,7 @@ class MyImages extends JComponent {
 	}
 
 	private BufferedImage drawSlice(MyVolume vol, MyVolume volBack, float[] selectedSlice, int plane, int cmapindex,
-			Boolean toggle) throws Exception
+			Boolean toggle, float opacity) throws Exception
 	// draw slice with position 't' in the plane 'plane' at position ox, oy
 	// using colourmap 'cmapindex'
 	{
@@ -621,8 +630,19 @@ class MyImages extends JComponent {
 					rgb = value2rgb(v, cmapindex);
 				rgb0 = value2rgb(v0, 0);
 //				rgb0 = cmap[0][v0 * 255 / sliceMax];
-				if (rgb > 0 && toggle)
-					theImg.setRGB(x, y, rgb);
+				if (rgb > 0 && toggle) {
+					int r = (rgb >> 16) & 0xFF;
+					int g = (rgb >> 8) & 0xFF;
+					int b = rgb & 0xFF;
+					int r0 = (rgb0 >> 16) & 0xFF;
+					int g0 = (rgb0 >> 8) & 0xFF;
+					int b0 = rgb0 & 0xFF;
+					int r1 = Math.round(r * opacity + r0 * (1-opacity));
+					int g1 = Math.round(g * opacity + g0 * (1-opacity));
+					int b1 = Math.round(b * opacity + b0 * (1-opacity));
+					int rgb1 = r1 << 16 | g1 << 8 | b1;
+					theImg.setRGB(x, y, rgb1);
+				}
 				else
 					theImg.setRGB(x, y, rgb0);
 			}
@@ -930,11 +950,12 @@ class MyImages extends JComponent {
 			vol = volumes.getVolume(subjectDir + "/" + volName, !imgList[i].color);
 			int plane = imgList[i].getPlane();
 			int cmapindex = imgList[i].color ? 1 : 0;
+			float opacity = imgList[i].opacity;
 
 			try {
 				if (imgList[i].volback != null) {
 					volBack = volumes.getVolume(subjectDir + "/" + imgList[i].volback, true);
-					bufImg0 = drawSlice(vol, volBack, selectedSlice, plane, cmapindex, toggle);
+					bufImg0 = drawSlice(vol, volBack, selectedSlice, plane, cmapindex, toggle, opacity);
 				} else
 					bufImg0 = drawSlice(vol, selectedSlice, plane, cmapindex);
 			} catch (Exception e) {

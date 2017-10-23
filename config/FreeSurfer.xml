@@ -8,6 +8,7 @@
             <effect>2D</effect>
             <output>aseg</output>
             <volback>mri/orig.mgz</volback>
+            <opacity>1</opacity>
         </image>
         <image>
             <volume>mri/brain.mgz</volume>
