@@ -117,6 +117,7 @@ class MyImages extends JComponent {
 			String effect = config.getString("effect");
 			String output = config.getString("output");
 			String volback = config.getString("volback");
+			String volbackall = config.getString("volbackall");
 			try {
 				opacity = config.getFloat("opacity");
 			}
@@ -128,7 +129,7 @@ class MyImages extends JComponent {
 			if (color && segVolume == null)
 				segVolume = volume;
 			for (int plane = 0; plane < 3; plane++) {
-				imgList[j] = new MyImage(volume, color, effect, output, volback, plane, opacity);
+				imgList[j] = new MyImage(volume, color, effect, output, volback, volbackall, plane, opacity);
 				j++;
 			}
 		}
@@ -918,12 +919,19 @@ class MyImages extends JComponent {
 					QCApp.printStatusMessage("Drawing volume \"" + volName + "\", plane:" + volPlane + "...");
 
 					cmapindex = imgList[i].color ? 1 : 0;
+					float opacity = imgList[i].opacity;
 
 					try {
-						if (imgType.equals("2D"))
-							bufImgList[i] = drawSlice(vol, selectedSlice, plane, cmapindex);
-						else
+						if (imgType.equals("3D")) {
 							bufImgList[i] = drawVolume(vol, plane, cmapindex);
+						} 
+						else {
+							if (imgList[i].volbackall != null) {
+								volBack = volumes.getVolume(subjectDir + "/" + imgList[i].volbackall, true);
+								bufImgList[i] = drawSlice(vol, volBack, selectedSlice, plane, cmapindex, true, opacity);
+							} else
+								bufImgList[i] = drawSlice(vol, selectedSlice, plane, cmapindex);
+						}
 						
 						if (init) {
 							// save image (create directory qc if it does not exist)
