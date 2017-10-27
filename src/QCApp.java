@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
+import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -96,7 +97,12 @@ public class QCApp {
 	private static JLabel zoomLabel;
 	private static JLabel zoomValueLabel;
 	
+	private static JSlider opacitySlider;
+	private static JLabel opacityLabel;
+	private static JLabel opacityValueLabel;
+
 	public static double zoom;
+	public static float opacity;
 	
 	public static List<RegionColor> colorLUT;
 	public static List<HierarchicalConfiguration<ImmutableNode>> imageConfigs;
@@ -383,6 +389,14 @@ public class QCApp {
 		zoomValueLabel.setText("x" + String.format("%.2f", zoom));
 		images.repaint();
 	}
+	
+	private static void updateOpacity() {
+		opacity = opacitySlider.getValue()/100f;
+		opacityValueLabel.setText(String.format("%.2f", opacity));
+		if (images.initialized)
+			images.setImages();
+		images.repaint();
+	}
 
 	public static void createAndShowGUI() {
 		f = new JFrame("QCApp");
@@ -452,9 +466,10 @@ public class QCApp {
 		positionLabel = new JLabel();
 		
 		// Zoom slider
-		zoomSlider = new JSlider(JSlider.HORIZONTAL, 50, 300, 200);
+		zoomSlider = new JSlider(JSlider.HORIZONTAL, 50, 400, 200);
 		zoomSlider.setMajorTickSpacing(50);
 		zoomSlider.setMinorTickSpacing(5);
+		zoomSlider.setBorder(BorderFactory.createEmptyBorder(0, -5, 0, -5));
 		zoomSlider.setPaintTicks(false);
 		zoomSlider.setPaintLabels(false);
 		zoomSlider.setSnapToTicks(true);
@@ -463,13 +478,24 @@ public class QCApp {
 				updateZoom();
 			}
 		});
-		//zoom.setVisible(true);
-		
-		zoomLabel = new JLabel("Zoom: ");
-		//zoomLabel.setVisible(false);
+		zoomLabel = new JLabel("Zoom:");
 		zoomValueLabel = new JLabel();
-		//zoomValueLabel.setVisible(false);
-		//zoomLabel.setLabelFor(zoom);
+		
+		// Opacity slider
+		opacitySlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);
+		opacitySlider.setMajorTickSpacing(20);
+		opacitySlider.setMinorTickSpacing(2);
+		opacitySlider.setBorder(BorderFactory.createEmptyBorder(0, -5, 0, -5));
+		opacitySlider.setPaintTicks(false);
+		opacitySlider.setPaintLabels(false);
+		opacitySlider.setSnapToTicks(true);
+		opacitySlider.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				updateOpacity();
+			}
+		});
+		opacityLabel = new JLabel("Opacity:");
+		opacityValueLabel = new JLabel();
 
 		// Table
 		model = new MyTableModel();
@@ -508,8 +534,9 @@ public class QCApp {
 		// Image
 		images = new MyImages();
 		JScrollPane imagesScrollPane = new JScrollPane(images);
-		
+
 		updateZoom();
+		updateOpacity();
 
 		// Split Pane for Table and Graphs
 		JSplitPane splitPaneForTableAndGraphs = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrollPane, graphs);
@@ -536,9 +563,11 @@ public class QCApp {
 						.addComponent(zoomLabel)
 						.addComponent(zoomSlider, 50, 100, 100)
 						.addComponent(zoomValueLabel)
+						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 15, 15)
+						.addComponent(opacityLabel)
+						.addComponent(opacitySlider, 50, 100, 100)
+						.addComponent(opacityValueLabel)
 						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						//.addComponent(configListLabel)
-						//.addComponent(configList)
 						.addComponent(positionLabel)
 						)
 				.addComponent(splitPane)
@@ -551,8 +580,9 @@ public class QCApp {
 						.addComponent(zoomLabel)
 						.addComponent(zoomSlider)
 						.addComponent(zoomValueLabel)
-						//.addComponent(configList)
-						//.addComponent(configListLabel)
+						.addComponent(opacityLabel)
+						.addComponent(opacitySlider)
+						.addComponent(opacityValueLabel)
 						.addComponent(positionLabel)
 						)
 				.addComponent(splitPane)

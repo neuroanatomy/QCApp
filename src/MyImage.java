@@ -6,10 +6,9 @@ class MyImage {
 	public String volback;
 	public String volbackall;
 	private int plane;
-	public float opacity;
 	
 	public MyImage(String volName, boolean color, String effect, String output,
-			String volback, String volbackall, int plane, float opacity) {
+			String volback, String volbackall, int plane) {
 		this.volName = volName;
 		this.color = color;
 		this.effect = effect;
@@ -17,7 +16,6 @@ class MyImage {
 		this.volback = volback;
 		this.volbackall = volbackall;
 		this.plane = plane;
-		this.opacity = opacity;
 	}
 	
 	public int getPlane() {
