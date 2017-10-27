@@ -25,7 +25,7 @@ class MyImages extends JComponent {
 	private Rectangle rect[];
 	private Boolean toggle;
 	private int selectedImage = 0;
-	private int initialized = 0;
+	public boolean initialized = false;
 	private float[] selectedSlice = { 0.5f, 0.5f, 0.5f };
 	private int yprev;
 	private float prevSlice;
@@ -93,7 +93,6 @@ class MyImages extends JComponent {
 	}
 	
 	public void renew() {
-		float opacity = 0;
 		cmap = new int[2][256];
 		
 		// init greyscale colourmap
@@ -118,24 +117,16 @@ class MyImages extends JComponent {
 			String output = config.getString("output");
 			String volback = config.getString("volback");
 			String volbackall = config.getString("volbackall");
-			try {
-				opacity = config.getFloat("opacity");
-			}
-			catch (Exception e) {
-				opacity = 1f;
-			}
-			if (opacity <= 0 || opacity > 1)
-				opacity = 1f;
 			if (color && segVolume == null)
 				segVolume = volume;
 			for (int plane = 0; plane < 3; plane++) {
-				imgList[j] = new MyImage(volume, color, effect, output, volback, volbackall, plane, opacity);
+				imgList[j] = new MyImage(volume, color, effect, output, volback, volbackall, plane);
 				j++;
 			}
 		}
 		
 		selectedImage = 0;
-		initialized = 0;
+		initialized = false;
 		volumes = new MyVolumes();
 		rect = new Rectangle[imgList.length];
 		repaint();
@@ -197,7 +188,7 @@ class MyImages extends JComponent {
 	private void mouseDownOnImage(MouseEvent e) {
 		int i;
 
-		if (initialized == 0)
+		if (!initialized)
 			return;
 
 		if (selectedImage == 0) {
@@ -249,7 +240,7 @@ class MyImages extends JComponent {
 		yprev = e.getY();
 		prevHeight = 0;
 
-		if (initialized == 0)
+		if (!initialized)
 			return;
 
 		if (selectedImage == 0)
@@ -278,7 +269,7 @@ class MyImages extends JComponent {
 		float[] dim1 = new float[3];
 		float dim;
 
-		if (initialized == 0)
+		if (!initialized)
 			return;
 	    
 		if (selectedImage == 0)
@@ -808,7 +799,7 @@ class MyImages extends JComponent {
 		g.setColor(Color.black);
 		g.fillRect(0, 0, dim.width, dim.height);
 
-		if (initialized == 0)
+		if (!initialized)
 			return;
 
 		if (selectedImage == 0) {
@@ -884,6 +875,9 @@ class MyImages extends JComponent {
 		MyVolume vol;
 		MyVolume volBack;
 		int err = 0;
+		
+		if (imgList == null)
+			return 1;
 
 		if (selectedImage == 0) {
 			// All images view
@@ -919,7 +913,7 @@ class MyImages extends JComponent {
 					QCApp.printStatusMessage("Drawing volume \"" + volName + "\", plane:" + volPlane + "...");
 
 					cmapindex = imgList[i].color ? 1 : 0;
-					float opacity = imgList[i].opacity;
+					float opacity = QCApp.opacity;
 
 					try {
 						if (imgType.equals("3D")) {
@@ -958,7 +952,7 @@ class MyImages extends JComponent {
 			vol = volumes.getVolume(subjectDir + "/" + volName, !imgList[i].color);
 			int plane = imgList[i].getPlane();
 			int cmapindex = imgList[i].color ? 1 : 0;
-			float opacity = imgList[i].opacity;
+			float opacity = QCApp.opacity;
 
 			try {
 				if (imgList[i].volback != null) {
@@ -976,7 +970,7 @@ class MyImages extends JComponent {
 
 		repaint();
 		updatePositionLabel();
-		initialized = 1;
+		initialized = true;
 
 		return err;
 	}
