@@ -24,11 +24,11 @@ Run it like this (with GUI):
 
     java -jar target/QCApp-0.0.1-SNAPSHOT.jar
 
-or like this (without GUI) (not fully implemented):
+or like this (without GUI) (for FreeSurfer):
 
-    java -Djava.awt.headless=true -jar target/QCApp-0.0.1-SNAPSHOT.jar /path/to/subject/directory
+    java -Djava.awt.headless=true -jar target/QCApp-0.0.1-SNAPSHOT.jar target/config/FreeSurfer.xml /path/to/subject/directory
 
-The volumes QCApp looks for are:
+The volumes QCApp looks for are specified in FreeSurfer.xml:
     brain.mgz
     aseg.mgz
     orig.mgz

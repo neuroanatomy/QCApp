@@ -31,7 +31,7 @@ class MyImages extends JComponent {
 	private float prevSlice;
 	private int prevPlane;
 	private double prevHeight;
-	private String subjectDir;
+	private File subjectDir;
 	private MyImage[] imgList;
 	private BufferedImage bufImg0; // single view bitmap image
 	private BufferedImage bufImgList[]; // bitmap images
@@ -56,8 +56,10 @@ class MyImages extends JComponent {
 	
 	private MyVolumes volumes;
 
-	public MyImages(String subjectDir) {
+	public MyImages(File subjectDir) {
 		this();
+		renew();
+		QCApp.usePictures = true;
 		changeSubjectDir(subjectDir);
 	}
 
@@ -132,7 +134,7 @@ class MyImages extends JComponent {
 		repaint();
 	}
 
-	public void changeSubjectDir(String subjectDir) {
+	public void changeSubjectDir(File subjectDir) {
 		float tmp[] = new float[3], tmpd[] = new float[3];
 		int dim1[] = new int[3];
 		int[][] bounds = new int[3][2];
@@ -143,7 +145,7 @@ class MyImages extends JComponent {
 		
 		// Set selected slices at the center of the segmentation
 		if (segVolume != null) {
-			MyVolume vol = volumes.getVolume(subjectDir + "/" + segVolume, false);
+			MyVolume vol = volumes.getVolume(new File(subjectDir, segVolume), false);
 			
 			//invMat(invS, vol.S);
 			
@@ -182,7 +184,7 @@ class MyImages extends JComponent {
 			selectedSlice[2] = 0.5f;
 		}
 		// To use image files, call setImages(true)
-		setImages(false);
+		setImages(QCApp.usePictures);
 	}
 
 	private void mouseDownOnImage(MouseEvent e) {
@@ -285,7 +287,7 @@ class MyImages extends JComponent {
 			return;
 
 		String volName = imgList[i].volName;
-		MyVolume vol = volumes.getVolume(subjectDir + "/" + volName, !imgList[i].color);
+		MyVolume vol = volumes.getVolume(new File(subjectDir, volName), !imgList[i].color);
 		
 		//invMat(invS, vol.S);
 		
@@ -898,10 +900,10 @@ class MyImages extends JComponent {
 				
 				// QC images unavailable: make them (and save them)
 				volName = imgList[i].volName;
-				vol = volumes.getVolume(subjectDir + "/" + volName, !imgList[i].color);
+				vol = volumes.getVolume(new File(subjectDir, volName), !imgList[i].color);
 				if (vol.volume == null) {
 					QCApp.printStatusMessage(
-							"ERROR: Volume \"" + subjectDir + "/" + volName + "\" unavailable.");
+							"ERROR: Volume \"" + new File(subjectDir, volName) + "\" unavailable.");
 					bufImgList[i] = drawErrorSlice();
 					err = 1;
 				} else {
@@ -921,7 +923,7 @@ class MyImages extends JComponent {
 						} 
 						else {
 							if (imgList[i].volbackall != null) {
-								volBack = volumes.getVolume(subjectDir + "/" + imgList[i].volbackall, true);
+								volBack = volumes.getVolume(new File(subjectDir, imgList[i].volbackall), true);
 								bufImgList[i] = drawSlice(vol, volBack, selectedSlice, plane, cmapindex, true, opacity);
 							} else
 								bufImgList[i] = drawSlice(vol, selectedSlice, plane, cmapindex);
@@ -939,7 +941,7 @@ class MyImages extends JComponent {
 						err = 1;
 						return err;
 					} finally {
-						QCApp.printStatusMessage("");
+						QCApp.clearStatusMessage();
 					}
 				}
 			}
@@ -949,14 +951,14 @@ class MyImages extends JComponent {
 
 			// load volume
 			volName = imgList[i].volName;
-			vol = volumes.getVolume(subjectDir + "/" + volName, !imgList[i].color);
+			vol = volumes.getVolume(new File(subjectDir, volName), !imgList[i].color);
 			int plane = imgList[i].getPlane();
 			int cmapindex = imgList[i].color ? 1 : 0;
 			float opacity = QCApp.opacity;
 
 			try {
 				if (imgList[i].volback != null) {
-					volBack = volumes.getVolume(subjectDir + "/" + imgList[i].volback, true);
+					volBack = volumes.getVolume(new File(subjectDir, imgList[i].volback), true);
 					bufImg0 = drawSlice(vol, volBack, selectedSlice, plane, cmapindex, toggle, opacity);
 				} else
 					bufImg0 = drawSlice(vol, selectedSlice, plane, cmapindex);
@@ -976,7 +978,8 @@ class MyImages extends JComponent {
 	}
 	
 	public void updatePositionLabel() {
-		QCApp.positionLabel.setText(String.format("R:%.3f A:%.3f S:%.3f", selectedSlice[0], selectedSlice[1], selectedSlice[2]));
+		if (QCApp.positionLabel != null)
+			QCApp.positionLabel.setText(String.format("R:%.3f A:%.3f S:%.3f", selectedSlice[0], selectedSlice[1], selectedSlice[2]));
 	}
 
 }

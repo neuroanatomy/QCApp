@@ -1,4 +1,5 @@
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +24,7 @@ class MyVolume {
 	//int maxval;
 	boolean redim;
 
-	String fileName;
+	File file;
 	ByteOrder BYTE_ORDER;
 
 	int bytesPerVoxel() {
@@ -273,12 +274,13 @@ class MyVolume {
 			return 0;
 	}
 
-	public MyVolume(String fileName, boolean redim) {
+	public MyVolume(File file, boolean redim) {
 		InputStream is = null;
-		this.fileName = fileName;
+		this.file = file;
 		this.redim = redim;
+		String fileName = file.getPath();
 		try {
-	        is = new FileInputStream(fileName);
+	        is = new FileInputStream(file);
 			if (fileName.matches(".*\\.m?gz"))
 	            is = new GZIPInputStream(is);
 			is = new DataInputStream(is);

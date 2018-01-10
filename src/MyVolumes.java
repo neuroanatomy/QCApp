@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,16 +11,16 @@ class MyVolumes {
 //		return getVolume(fileName, false);
 //	}
 
-	public MyVolume getVolume(String fileName, boolean redim) {
+	public MyVolume getVolume(File file, boolean redim) {
 		for (MyVolume vol : volumes) {
-			if (vol.fileName.equals(fileName) && vol.redim == redim) {
+			if (vol.file.equals(file) && vol.redim == redim) {
 				volumes.remove(vol);
 				volumes.add(vol);
 				return vol;
 			}
 		}
-		QCApp.printStatusMessage("Loading volume \"" + fileName + "\"...");
-		MyVolume newVol = new MyVolume(fileName, redim);
+		QCApp.printStatusMessage("Loading volume \"" + file + "\"...");
+		MyVolume newVol = new MyVolume(file, redim);
 		if (volumes.size() >= MAX_VOLUMES)
 			volumes.subList(0, volumes.size() - MAX_VOLUMES).clear();
 		volumes.add(newVol);

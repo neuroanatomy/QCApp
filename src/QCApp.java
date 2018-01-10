@@ -4,6 +4,7 @@
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -101,8 +103,11 @@ public class QCApp {
 	private static JLabel opacityLabel;
 	private static JLabel opacityValueLabel;
 
+	private static JCheckBox usePicturesButton;
+
 	public static double zoom;
-	public static float opacity;
+	public static float opacity = 1;
+	public static boolean usePictures;
 	
 	public static List<RegionColor> colorLUT;
 	public static List<HierarchicalConfiguration<ImmutableNode>> imageConfigs;
@@ -119,6 +124,13 @@ public class QCApp {
 			QCApp.status.paintImmediately(QCApp.status.getVisibleRect());
 		} else
 			System.out.println(msg);
+	}
+	
+	public static void clearStatusMessage() {
+		if (QCApp.status != null) {
+			QCApp.status.setText("");
+			QCApp.status.paintImmediately(QCApp.status.getVisibleRect());
+		}
 	}
 	
 	public static void setTableChanged(boolean tableChanged) {
@@ -170,7 +182,7 @@ public class QCApp {
 		String subject = model.getValueAt(i, 2).toString();
 
 		printStatusMessage("Subject: " + subject + ".");
-		images.changeSubjectDir(subjectsDir + "/" + subject);
+		images.changeSubjectDir(new File(subjectsDir, subject));
 
 		graphs.setSelectedSubject(subject);
 	}
@@ -254,7 +266,7 @@ public class QCApp {
 			saveButton.setEnabled(true);
 //			zoomSlider.setVisible(true);
 //			zoomLabel.setVisible(true);
-//			zoomValueLabel.setVisible(true);
+//			zoomValueLabel.setVisible(true)
 			images.renew();
 			table.changeSelection(0, 0, false, false);
 			table.requestFocus();
@@ -496,6 +508,14 @@ public class QCApp {
 		});
 		opacityLabel = new JLabel("Opacity:");
 		opacityValueLabel = new JLabel();
+		
+		usePicturesButton = new JCheckBox("pics");
+		usePicturesButton.setMnemonic(KeyEvent.VK_P);
+		usePicturesButton.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				usePictures = usePicturesButton.isSelected();
+			}
+		});
 
 		// Table
 		model = new MyTableModel();
@@ -567,6 +587,7 @@ public class QCApp {
 						.addComponent(opacityLabel)
 						.addComponent(opacitySlider, 50, 100, 100)
 						.addComponent(opacityValueLabel)
+						.addComponent(usePicturesButton)
 						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 						.addComponent(positionLabel)
 						)
@@ -583,6 +604,7 @@ public class QCApp {
 						.addComponent(opacityLabel)
 						.addComponent(opacitySlider)
 						.addComponent(opacityValueLabel)
+						.addComponent(usePicturesButton)
 						.addComponent(positionLabel)
 						)
 				.addComponent(splitPane)
@@ -602,10 +624,12 @@ public class QCApp {
 			     .collect(Collectors.toList());
 		
     	
-		if (args.length == 1) {
-			File dir = new File(args[0]);
-			//new MyImages(dir.getPath());
-			images.changeSubjectDir(dir.getPath());
+		if (args.length == 2) {
+			File configFile = new File(args[0]);
+			loadConfiguration(configFile);
+			File dir = new File(args[1]);
+			images = new MyImages(dir);
+			// images.changeSubjectDir(dir.getPath(), true);
 		} else {
 			new QCApp();
 			createAndShowGUI();
