@@ -5,7 +5,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.stream.IntStream;
 import java.util.zip.GZIPInputStream;
 
 class MyVolume {
@@ -48,6 +52,10 @@ class MyVolume {
 	}
 
 	void loadFreeSurferVolume(DataInputStream dis) throws IOException {
+//
+//		Date currentDate = new Date();      
+//        System.out.println(currentDate.getTime() + " - loadFSV");
+        
 		BYTE_ORDER = ByteOrder.BIG_ENDIAN;
 		final int HEADER_SIZE = 284;
 		final int MGHUCHAR = 0;
@@ -95,6 +103,9 @@ class MyVolume {
 		R[2][2] = bb.getFloat(74);
 
 		loadVolume(dis);
+//
+//		currentDate = new Date();      
+//        System.out.println(currentDate.getTime() + " - End loadFSV");
 	}
 
 	void loadNiftiVolume(DataInputStream dis) throws IOException {
@@ -155,40 +166,62 @@ class MyVolume {
 	}
 
 	void loadVolume(DataInputStream dis) throws IOException {
-		byte[] buffer;
 		ByteBuffer bb;
 		float mult;
+//		
+//		Date currentDate = new Date();      
+//        System.out.println(currentDate.getTime() + " - loadV");
 		
-		//System.out.println("Allocating " + dim[0] * dim[1] * dim[2] * bytesPerVoxel() + " bytes");
-		buffer = new byte[dim[0] * dim[1] * dim[2] * bytesPerVoxel()];
-		dis.readFully(buffer, 0, buffer.length);
-		
-		bb = ByteBuffer.wrap(buffer);
+        ReadableByteChannel chan = Channels.newChannel(dis);
+        bb = ByteBuffer.allocate(dim[0] * dim[1] * dim[2] * bytesPerVoxel());
+        chan.read(bb);
+        bb.rewind();
 		bb.order(BYTE_ORDER);
+//
+//		currentDate = new Date();      
+//        System.out.println(currentDate.getTime() + " - 1st loop");
 		
+		
+		int size = dim[0]*dim[1]*dim[2];
+		System.out.println("Allocating " + size + " bytes");
 		volume = new byte[dim[2]][dim[1]][dim[0]];
-		int[] values = new int[dim[0]*dim[1]*dim[2]];
-		for (int k = 0; k < dim[2]; k += 1)
-			for (int j = 0; j < dim[1]; j += 1)
-				for (int i = 0; i < dim[0]; i += 1) {
-					switch (datatype) {
-					case DT_UINT8:
-						values[k*dim[1]*dim[0] + j*dim[0] + i] = bb.get() & 0xFF;
-						break;
-					case DT_INT16:
-						values[k*dim[1]*dim[0] + j*dim[0] + i] = bb.getShort();
-						break;
-					case DT_INT32:
-						values[k*dim[1]*dim[0] + j*dim[0] + i] = bb.getInt();
-						break;
-					case DT_FLOAT32:
-						values[k*dim[1]*dim[0] + j*dim[0] + i] = (int) bb.getFloat();
-						break;
-					}
-					//values[k*dim[1]*dim[0] + j*dim[0] + i] = volume[k][j][i];
-				}
+		IntStream ist;
+		int values[];
+		switch (datatype) {
+		case DT_UINT8:
+			ist = IntStream.range(0, size).map(i -> bb.get() & 0xFF);
+			break;
+		case DT_INT16:
+			ist = IntStream.range(0, size).map(i -> bb.getShort());
+			break;
+		case DT_INT32:
+			ist = IntStream.range(0, size).map(i -> bb.getInt());
+			break;
+		case DT_FLOAT32:
+			ist = IntStream.range(0, size).map(i -> (int) bb.getFloat());
+			break;
+		default:
+			QCApp.printStatusMessage("Error unknown data type for volume: " + "volName");
+			return;
+		}
+		
+		values = ist.toArray();
+//
+//		currentDate = new Date();      
+//        System.out.println(currentDate.getTime() + " - end 1st loop - copy");
+        
+        chan.close();
+        
 		int[] values2 = Arrays.copyOf(values, values.length);
+//
+//		currentDate = new Date();      
+//        System.out.println(currentDate.getTime() + " - end copy - sort");
+        
 		Arrays.sort(values2);
+//
+//		currentDate = new Date();      
+//        System.out.println(currentDate.getTime() + " - end sort");
+        
 		float maxval = values2[(int)(dim[0]*dim[1]*dim[2]*.98)];
 		
 		// Convert values from int to byte for using less memory
@@ -196,7 +229,10 @@ class MyVolume {
 			mult = 255 / maxval;
 		else
 			mult = 1;
-			
+//
+//		currentDate = new Date();      
+//        System.out.println(currentDate.getTime() + " - 2nd loop");
+        
 		for (int k = 0; k < dim[2]; k += 1)
 			for (int j = 0; j < dim[1]; j += 1)
 				for (int i = 0; i < dim[0]; i += 1) {
@@ -206,7 +242,10 @@ class MyVolume {
 					else if (value > 255)
 						volume[k][j][i] = (byte) 255;
 				}
-
+//
+//		currentDate = new Date();      
+//        System.out.println(currentDate.getTime() + " - end 2nd loop - 3rd loop");
+        
 		// Get bounding boxes and maxval
 		for (int m=0; m<boundingBox.length; m++) {
 			boundingBox[m][0] = dim[0] - 1; // min i
@@ -261,6 +300,10 @@ class MyVolume {
 //			if (boundingBox[m][5] > dim[2] - 1)
 //				boundingBox[m][5] = dim[2] - 1;
 		}
+//
+//		currentDate = new Date();      
+//        System.out.println(currentDate.getTime() + " - end 3rd loop - End loadV");
+        
 	}
 	
 	
@@ -279,6 +322,10 @@ class MyVolume {
 		this.file = file;
 		this.redim = redim;
 		String fileName = file.getPath();
+//        
+//		Date currentDate = new Date();      
+//        System.out.println(currentDate.getTime() + " - MyVolume - " + fileName);
+        
 		try {
 	        is = new FileInputStream(file);
 			if (fileName.matches(".*\\.m?gz"))
@@ -302,5 +349,8 @@ class MyVolume {
 				e.printStackTrace();
 			}
 		}
+//		
+//		currentDate = new Date();      
+//        System.out.println(currentDate.getTime() + " - End MyVolume");
 	}
 }

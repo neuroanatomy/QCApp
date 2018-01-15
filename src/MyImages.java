@@ -32,7 +32,7 @@ class MyImages extends JComponent {
 	private int prevPlane;
 	private double prevHeight;
 	private File subjectDir;
-	private MyImage[] imgList;
+	MyImage[] imgList;
 	private BufferedImage bufImg0; // single view bitmap image
 	private BufferedImage bufImgList[]; // bitmap images
 	static int cmap[][]; // colour maps
@@ -54,7 +54,7 @@ class MyImages extends JComponent {
 			{ 0, 0, 1 }
 	};
 	
-	private MyVolumes volumes;
+	MyVolumes volumes;
 
 	public MyImages(File subjectDir) {
 		this();
