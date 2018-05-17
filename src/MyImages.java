@@ -104,7 +104,7 @@ class MyImages extends JComponent {
 		// init segmentation label colourmap
 		for (RegionColor regionColor : QCApp.colorLUT) {
 			int No = regionColor.No;
-            if (No >= 0 && No < 255)
+            if (No >= 0 && No <= 255)
                 cmap[1][No] = rgb2value(regionColor.R, regionColor.G, regionColor.B);
 		}
 

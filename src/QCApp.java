@@ -163,7 +163,7 @@ public class QCApp {
             if (parts.length < 5)
             	continue;
             int No = Integer.valueOf(parts[0]);
-            if (No >= 0 && No < 255) {
+            if (No >= 0 && No <= 255) {
                 RegionColor regionColor = new RegionColor();
                 regionColor.No = No;
                 regionColor.label = parts[1];
