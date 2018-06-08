@@ -187,7 +187,7 @@ public class QCApp {
 		graphs.setSelectedSubject(subject);
 	}
 
-	public static void chooseDirectory() {
+	public static void chooseDirectory() throws IOException {
 		List<String> subjects = new ArrayList<String>();
 		if (tableChanged) {
 	        int ans = JOptionPane.showConfirmDialog(f, 
@@ -200,6 +200,23 @@ public class QCApp {
 	        } else if (ans == JOptionPane.CANCEL_OPTION)
 		    	return;
 		}
+		
+		// Detect configuration files
+		configDir = Paths.get(QCApp.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent().resolve("config");
+		configFiles = Files.list(configDir)
+			     .filter(Files::isRegularFile)
+			     .filter(path -> path.toString().endsWith(".xml"))
+			     .map(Path::toFile)
+			     .sorted(Comparator.comparing(file -> file.getName().substring(0, file.getName().length() - 4)))
+			     .collect(Collectors.toList());
+
+		// Configuration Combo Box
+		String[] configNames = configFiles.stream().map(file -> file.getName().substring(0, file.getName().length() - 4)).toArray(String[]::new);
+		configList = new JComboBox<String>(configNames);
+
+		// Configuration Combo Box Label
+		configListLabel = new JLabel("Configuration: ");
+		configListLabel.setLabelFor(configList);
 
 		// select Subjects directory
 		final JFileChooser fc = new JFileChooser();
@@ -444,7 +461,12 @@ public class QCApp {
 		chooseButton = new JButton("Choose Subjects Directory...");
 		chooseButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				chooseDirectory();
+				try {
+					chooseDirectory();
+				} catch (IOException e1) {
+					JOptionPane.showMessageDialog(null, "Error listing configuration files", "Error", JOptionPane.ERROR_MESSAGE);
+					e1.printStackTrace();
+				}
 			}
 		});
 
@@ -465,14 +487,6 @@ public class QCApp {
 				loadQC();
 			}
 		});
-		
-		// Configuration Combo Box
-		String[] configNames = configFiles.stream().map(file -> file.getName().substring(0, file.getName().length() - 4)).toArray(String[]::new);
-		configList = new JComboBox<String>(configNames);
-
-		// Configuration Combo Box Label
-		configListLabel = new JLabel("Configuration: ");
-		configListLabel.setLabelFor(configList);
 		
 		// Position Label
 		positionLabel = new JLabel();
@@ -614,15 +628,6 @@ public class QCApp {
 	}
 
 	public static void main(String[] args) throws NumberFormatException, IOException, ConfigurationException{
-		
-		configDir = Paths.get(QCApp.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent().resolve("config");
-		configFiles = Files.list(configDir)
-			     .filter(Files::isRegularFile)
-			     .filter(path -> path.toString().endsWith(".xml"))
-			     .map(Path::toFile)
-			     .sorted(Comparator.comparing(file -> file.getName().substring(0, file.getName().length() - 4)))
-			     .collect(Collectors.toList());
-		
     	
 		if (args.length == 2) {
 			File configFile = new File(args[0]);
