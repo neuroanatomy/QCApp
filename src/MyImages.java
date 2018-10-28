@@ -90,13 +90,13 @@ class MyImages extends JComponent {
                 mouseWheelRotatedOnImage(e);
             }
         });
-    
+
         volumes = new MyVolumes();
     }
 
     public void renew() {
         cmap = new int[2][256];
-    
+
         // init greyscale colourmap
         for (int i = 0; i < cmap[0].length; i++)
             cmap[0][i] = rgb2value(i, i, i);
@@ -126,7 +126,7 @@ class MyImages extends JComponent {
                 j++;
             }
         }
-    
+
         selectedImage = 0;
         initialized = false;
         volumes = new MyVolumes();
@@ -139,16 +139,14 @@ class MyImages extends JComponent {
         int dim1[] = new int[3];
         int[][] bounds = new int[3][2];
         //float[][] invS = new float[3][3];
-    
+
         this.subjectDir = subjectDir;
         //volumes = new MyVolumes();
-    
+
         // Set selected slices at the center of the segmentation
         if (segVolume != null) {
             MyVolume vol = volumes.getVolume(new File(subjectDir, segVolume), false);
-        
-            //invMat(invS, vol.S);
-        
+
             // find dimension of volume
             tmp[0] = vol.dim[0] - 1;
             tmp[1] = vol.dim[1] - 1;
@@ -173,7 +171,7 @@ class MyImages extends JComponent {
             bounds[0][1] = Math.round(tmpd[0]);
             bounds[1][1] = Math.round(tmpd[1]);
             bounds[2][1] = Math.round(tmpd[2]);
-        
+
             selectedSlice[0] = ((bounds[0][0] + bounds[0][1]) / 2 - Math.min(dim1[0], 0)) / (float) Math.abs(dim1[0]);
             selectedSlice[1] = ((bounds[1][0] + bounds[1][1]) / 2 - Math.min(dim1[1], 0)) / (float) Math.abs(dim1[1]);
             selectedSlice[2] = ((bounds[2][0] + bounds[2][1]) / 2 - Math.min(dim1[2], 0)) / (float) Math.abs(dim1[2]);
@@ -273,7 +271,7 @@ class MyImages extends JComponent {
 
         if (!initialized)
             return;
-    
+
         if (selectedImage == 0)
             for (i = 0; i < rect.length; i++) {
                 if (rect[i].contains(e.getPoint()))
@@ -281,16 +279,14 @@ class MyImages extends JComponent {
             }
         else
             i = selectedImage - 1;
-    
+
         // Cursor is outside of rectangles
         if (i == rect.length)
             return;
 
         String volName = imgList[i].volName;
         MyVolume vol = volumes.getVolume(new File(subjectDir, volName), !imgList[i].color);
-    
-        //invMat(invS, vol.S);
-    
+
         // find dimension of volume
         tmp[0] = vol.dim[0] - 1;
         tmp[1] = vol.dim[1] - 1;
@@ -299,7 +295,7 @@ class MyImages extends JComponent {
         dim1[0] = tmpd[0];
         dim1[1] = tmpd[1];
         dim1[2] = tmpd[2];
-    
+
         dim = Math.abs(dim1[prevPlane]);
         selectedSlice[prevPlane] = prevSlice + steps / dim;
         if (selectedSlice[prevPlane] < 0)
@@ -336,7 +332,7 @@ class MyImages extends JComponent {
 
     public static void invMat(float[][] rM, float[][] M) {
         float d = detMat(M);
-    
+
         rM[0][0] = (M[1][1] * M[2][2] - M[2][1] * M[1][2]) / d;
         rM[0][1] = (M[2][1] * M[0][2] - M[0][1] * M[2][2]) / d;
         rM[0][2] = (M[0][1] * M[1][2] - M[1][1] * M[0][2]) / d;
@@ -350,7 +346,7 @@ class MyImages extends JComponent {
 
     static int value2rgb(int v, int cmapindex) {
         int rgb = 0;
-    
+
         if (v < 0)
             return 0;
         if (v > 255) {
@@ -360,7 +356,7 @@ class MyImages extends JComponent {
                 v = 0;
         }
         rgb = cmap[cmapindex][v];
-    
+
         return rgb;
     }
 
@@ -401,12 +397,12 @@ class MyImages extends JComponent {
         default:
             throw new Exception("No plane selected");
         }
-    
+
         multMat(T, P, vol.R);
         invMat(invT, T);
         // multMat(invT, vol.S, invP);
         // invMat(T, invT);
-    
+
         // find dimension of volume
         tmp[0] = vol.dim[0] - 1;
         tmp[1] = vol.dim[1] - 1;
@@ -443,7 +439,7 @@ class MyImages extends JComponent {
         rect.y = Math.min(bounds[1][0], bounds[1][1]);
         rect.width = Math.max(bounds[0][0], bounds[0][1]) - rect.x + 1;
         rect.height = Math.max(bounds[1][0], bounds[1][1]) - rect.y + 1;
-    
+
         // find selected slice corresponding to z
         tmp[0] = selectedSlice[0];
         tmp[1] = selectedSlice[1];
@@ -451,22 +447,6 @@ class MyImages extends JComponent {
         multMatVec(tmpd, P, selectedSlice);
         slice = Math.abs(tmpd[2]);
         z = Math.round((slice * Math.abs(dim1[2])) + Math.min(dim1[2], 0));
-
-//		// find maximum brightness
-//		for (x = rect.x; x < rect.width + rect.x; x++)
-//			for (y = rect.y; y < rect.height + rect.y; y++) {
-//				tmp[0] = x;
-//				tmp[1] = y;
-//				tmp[2] = z;
-//				multMatVec(tmpx, invT, tmp);
-//				x1 = Math.round(tmpx[0]);
-//				y1 = Math.round(tmpx[1]);
-//				z1 = Math.round(tmpx[2]);
-//				
-//				v = Math.round(vol.getValue(x1, y1, z1));
-//				if (v > sliceMax)
-//					sliceMax = v;
-//			}
 
         // draw slice
         theImg = new BufferedImage(rect.width, rect.height, BufferedImage.TYPE_INT_RGB);
@@ -495,11 +475,6 @@ class MyImages extends JComponent {
                 Math.round(rect.height * pixdim1[1] + 10), BufferedImage.TYPE_INT_RGB);
         AffineTransform at = new AffineTransform();
         at.scale(pixdim1[0], pixdim1[1]);
-//		BufferedWriter outputWriter = new BufferedWriter(new FileWriter("/Users/ntraut/tab.txt"));
-//		int[] pixels = ((DataBufferInt) theImg.getRaster().getDataBuffer()).getData();
-//		outputWriter.write(Arrays.toString(pixels));
-//		  outputWriter.flush();  
-//		  outputWriter.close(); 
         at.translate(5, 5);
         AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
         return scaleOp.filter(theImg, scaledImg);
@@ -539,12 +514,12 @@ class MyImages extends JComponent {
         default:
             throw new Exception("No plane selected");
         }
-    
+
         multMat(T, P, vol.R);
         invMat(invT, T);
         // multMat(invT, vol.S, invP);
         // invMat(T, invT);
-    
+
         tmp[0] = volBack.dim[0] - 1;
         tmp[1] = volBack.dim[1] - 1;
         tmp[2] = volBack.dim[2] - 1;
@@ -579,7 +554,7 @@ class MyImages extends JComponent {
         rect.y = Math.min(bounds[1][0], bounds[1][1]);
         rect.width = Math.max(bounds[0][0], bounds[0][1]) - rect.x + 1;
         rect.height = Math.max(bounds[1][0], bounds[1][1]) - rect.y + 1;
-    
+
         // find selected slice corresponding to z
         tmp[0] = selectedSlice[0];
         tmp[1] = selectedSlice[1];
@@ -640,7 +615,7 @@ class MyImages extends JComponent {
                 else
                     theImg.setRGB(x, y, rgb0);
             }
-    
+
         // scale
         BufferedImage scaledImg = new BufferedImage(Math.round(rect.width * pixdim1[0] + 10),
                 Math.round(rect.height * pixdim1[1] + 10), BufferedImage.TYPE_INT_RGB);
@@ -678,7 +653,7 @@ class MyImages extends JComponent {
         default:
             throw new Exception("No plane selected");
         }
-    
+
         multMat(T, P, vol.R);
         invMat(invT, T);
         // multMat(invT, vol.S, invP);
@@ -713,7 +688,7 @@ class MyImages extends JComponent {
         rect.y = Math.min(bounds[1][0], bounds[1][1]);
         rect.width = Math.max(bounds[0][0], bounds[0][1]) - rect.x + 1;
         rect.height = Math.max(bounds[1][0], bounds[1][1]) - rect.y + 1;
-    
+
         s0 = Math.min(bounds[2][0], bounds[2][1]); // 1st
         s1 = Math.max(bounds[2][0], bounds[2][1]); // last
 
@@ -766,35 +741,6 @@ class MyImages extends JComponent {
 
         return theImg;
     }
-
-//	private String getVolumeName(String name) {
-//		return name.substring(0, name.length() - 8);
-//	}
-//
-//	private String getPlaneName(String name) {
-//		return name.substring(name.length() - 1, name.length());
-//	}
-
-//	private int getPlane(String name) {
-//		String volPlane = getPlaneName(name);
-//		int plane = -1;
-//		if (volPlane.equals("X"))
-//			plane = 0;
-//		if (volPlane.equals("Y"))
-//			plane = 1;
-//		if (volPlane.equals("Z"))
-//			plane = 2;
-//		
-//		return plane;
-//	}
-
-//	private String getImageTypeName(String name) {
-//		return name.substring(name.length() - 4, name.length() - 2);
-//	}
-//
-//	private int getCMapIndex(String name) {
-//		return Integer.parseInt(name.substring(name.length() - 6, name.length() - 5));
-//	}
 
     public void paint(Graphics g) {
         Dimension dim = this.getSize();
@@ -877,7 +823,7 @@ class MyImages extends JComponent {
         MyVolume vol;
         MyVolume volBack;
         int err = 0;
-    
+
         if (imgList == null)
             return 1;
 
@@ -897,7 +843,7 @@ class MyImages extends JComponent {
                         } catch (IOException e) {}
                     }
                 }
-            
+
                 // QC images unavailable: make them (and save them)
                 volName = imgList[i].volName;
                 vol = volumes.getVolume(new File(subjectDir, volName), !imgList[i].color);
@@ -920,7 +866,7 @@ class MyImages extends JComponent {
                     try {
                         if (imgType.equals("3D")) {
                             bufImgList[i] = drawVolume(vol, plane, cmapindex);
-                        } 
+                        }
                         else {
                             if (imgList[i].volbackall != null) {
                                 volBack = volumes.getVolume(new File(subjectDir, imgList[i].volbackall), true);
@@ -928,7 +874,7 @@ class MyImages extends JComponent {
                             } else
                                 bufImgList[i] = drawSlice(vol, selectedSlice, plane, cmapindex);
                         }
-                    
+
                         if (init) {
                             // save image (create directory qc if it does not exist)
                             File qcdir =  new File(subjectDir + "/qc");

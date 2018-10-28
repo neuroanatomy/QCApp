@@ -32,7 +32,7 @@ class MyGraphs extends JComponent {
         Dimension dim = this.getSize();
         Stroke dashed = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 5.0f, new float[] { 5.0f },
                 0.0f);
-    
+
         // count non empty regions
         for (i = 0; i < NB_REGIONS; i++)
             if (mean[i] != 0)
@@ -82,7 +82,7 @@ class MyGraphs extends JComponent {
         g2.setStroke(dashed);
         g2.drawLine(0, dim.height / 4, dim.width, dim.height / 4);
         g2.drawLine(0, dim.height * 3 / 4, dim.width, dim.height * 3 / 4);
-    
+
         // to cope with a MAC OS X bug
         FontRenderContext frc = new FontRenderContext(g2.getTransform(), true, true);
 
@@ -100,7 +100,7 @@ class MyGraphs extends JComponent {
         int err = 0;
         for (int i = 0; i < x.length; i++)
             x[i] = 0;
-    
+
         try {
             input = new BufferedReader(new FileReader(subjectsDir + "/" + subject + "/" + QCApp.statsFileName));
             String line;
@@ -151,8 +151,7 @@ class MyGraphs extends JComponent {
         mean = new double[NB_REGIONS];
         std = new double[NB_REGIONS];
         selectedSubjectVolumes = new double[NB_REGIONS];
-    
-    
+
         double s0 = 0;
         double s1[] = new double[NB_REGIONS];
         double s2[] = new double[NB_REGIONS];
