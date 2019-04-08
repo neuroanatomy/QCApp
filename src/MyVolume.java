@@ -13,10 +13,10 @@ import java.util.stream.IntStream;
 import java.util.zip.GZIPInputStream;
 
 class MyVolume {
-	final static short DT_UINT8 = 2;
-	final static short DT_INT16 = 4;
-	final static short DT_INT32 = 8;
-	final static short DT_FLOAT32 = 16;
+    final static short DT_UINT8 = 2;
+    final static short DT_INT16 = 4;
+    final static short DT_INT32 = 8;
+    final static short DT_FLOAT32 = 16;
 
 	byte[][][] volume; 						// 3d volume data
 	int[] dim = new int[3]; 				// 3d volume dimensions
@@ -28,40 +28,36 @@ class MyVolume {
 	//int maxval;
 	boolean color;
 
-	File file;
-	ByteOrder BYTE_ORDER;
+    File file;
+    ByteOrder BYTE_ORDER;
 
-	int bytesPerVoxel() {
-		int bpv=0;
-		switch(datatype)
-		{
-			case DT_UINT8:		bpv=1; break;
-			case DT_INT16:		bpv=2; break;
-			case DT_INT32:		bpv=4; break;
-			case DT_FLOAT32:	bpv=4; break;
-		}
-		return bpv;
-	}
-	
-	private static int[] linspace(int min, int max, int points) {  
-	    int[] d = new int[points];
-	    for (int i = 0; i < points; i++){  
-	        d[i] = min + i * (max - min) / (points - 1);  
-	    }  
-	    return d;  
-	}
+    int bytesPerVoxel() {
+        int bpv=0;
+        switch(datatype)
+        {
+            case DT_UINT8:		bpv=1; break;
+            case DT_INT16:		bpv=2; break;
+            case DT_INT32:		bpv=4; break;
+            case DT_FLOAT32:	bpv=4; break;
+        }
+        return bpv;
+    }
 
-	void loadFreeSurferVolume(DataInputStream dis) throws IOException {
-//
-//		Date currentDate = new Date();      
-//        System.out.println(currentDate.getTime() + " - loadFSV");
-        
-		BYTE_ORDER = ByteOrder.BIG_ENDIAN;
-		final int HEADER_SIZE = 284;
-		final int MGHUCHAR = 0;
-		final int MGHINT = 1;
-		final int MGHFLOAT = 3;
-		final int MGHSHORT = 4;
+    private static int[] linspace(int min, int max, int points) {
+        int[] d = new int[points];
+        for (int i = 0; i < points; i++){
+            d[i] = min + i * (max - min) / (points - 1);
+        }
+        return d;
+    }
+
+    void loadFreeSurferVolume(DataInputStream dis) throws IOException {
+        BYTE_ORDER = ByteOrder.BIG_ENDIAN;
+        final int HEADER_SIZE = 284;
+        final int MGHUCHAR = 0;
+        final int MGHINT = 1;
+        final int MGHFLOAT = 3;
+        final int MGHSHORT = 4;
 
 		// Read volume data
 		byte b[] = new byte[HEADER_SIZE]; // total header size
@@ -105,125 +101,104 @@ class MyVolume {
 		R[1][3] = bb.getFloat(82);
 		R[2][3] = bb.getFloat(86);
 
-		loadVolume(dis);
-//
-//		currentDate = new Date();      
-//        System.out.println(currentDate.getTime() + " - End loadFSV");
-	}
+        loadVolume(dis);
+    }
 
-	void loadNiftiVolume(DataInputStream dis) throws IOException {
-		// float[][] R = new float[3][3];
-		final int HEADER_SIZE = 348;
-		BYTE_ORDER = ByteOrder.LITTLE_ENDIAN;
-		
-		// Read volume data
-		byte by[] = new byte[HEADER_SIZE]; // total header size
-		ByteBuffer bb = ByteBuffer.wrap(by);
-		dis.readFully(by, 0, HEADER_SIZE);
-		bb.order(BYTE_ORDER);
-		short dim0 = bb.getShort(40);
-		if (dim0 > 15) {
-			BYTE_ORDER = ByteOrder.BIG_ENDIAN;
-			bb.order(BYTE_ORDER);
-		}
-		
-		dim[0] = bb.getShort(42);
-		dim[1] = bb.getShort(44);
-		dim[2] = bb.getShort(46);
-		datatype = bb.getShort(70);
-		pixdim[0] = bb.getFloat(80);
-		pixdim[1] = bb.getFloat(84);
-		pixdim[2] = bb.getFloat(88);
-		
-		short qform_code = bb.getShort(0xFC);
-		if (qform_code < 1) {
-			QCApp.printStatusMessage("Error: qform_code < 1");
-			return;
-		}
-		
-		float qb = bb.getFloat(0x100);
-		float qc = bb.getFloat(0x104);
-		float qd = bb.getFloat(0x108);
-		float qq = bb.getFloat(76);
+    void loadNiftiVolume(DataInputStream dis) throws IOException {
+        // float[][] R = new float[3][3];
+        final int HEADER_SIZE = 348;
+        BYTE_ORDER = ByteOrder.LITTLE_ENDIAN;
 
-		float b = qb;
-		float c = qc;
-		float d = qd;
-		float q = Math.round(qq);
-		float a = (float) Math.sqrt(Math.max(1 - b*b - c*c - d*d, 0));
-		
-		R[0][0] = Math.round(a*a + b*b - c*c - d*d);
-		R[0][1] = Math.round(2 * (b*c - a*d));
-		R[0][2] = Math.round(2 * (b*d + a*c) * q);
-		R[1][0] = Math.round(2 * (b*c + a*d));
-		R[1][1] = Math.round(a*a + c*c - b*b - d*d);
-		R[1][2] = Math.round(2 * (c*d - a*b) * q);
-		R[2][0] = Math.round(2 * (b*d - a*c));
-		R[2][1] = Math.round(2 * (c*d + a*b));
-		R[2][2] = Math.round((a*a + d*d - b*b - c*c) * q);
-		
-		float vox_offset = bb.getFloat(108);
-		dis.skipBytes((int)vox_offset - HEADER_SIZE);
+        // Read volume data
+        byte by[] = new byte[HEADER_SIZE]; // total header size
+        ByteBuffer bb = ByteBuffer.wrap(by);
+        dis.readFully(by, 0, HEADER_SIZE);
+        bb.order(BYTE_ORDER);
+        short dim0 = bb.getShort(40);
+        if (dim0 > 15) {
+            BYTE_ORDER = ByteOrder.BIG_ENDIAN;
+            bb.order(BYTE_ORDER);
+        }
 
-		loadVolume(dis);
-	}
+        dim[0] = bb.getShort(42);
+        dim[1] = bb.getShort(44);
+        dim[2] = bb.getShort(46);
+        datatype = bb.getShort(70);
+        pixdim[0] = bb.getFloat(80);
+        pixdim[1] = bb.getFloat(84);
+        pixdim[2] = bb.getFloat(88);
 
-	void loadVolume(DataInputStream dis) throws IOException {
-		ByteBuffer bb;
-		float mult;
-//		
-//		Date currentDate = new Date();      
-//        System.out.println(currentDate.getTime() + " - loadV");
-		
+        short qform_code = bb.getShort(0xFC);
+        if (qform_code < 1) {
+            QCApp.printStatusMessage("Error: qform_code < 1");
+            return;
+        }
+
+        float qb = bb.getFloat(0x100);
+        float qc = bb.getFloat(0x104);
+        float qd = bb.getFloat(0x108);
+        float qq = bb.getFloat(76);
+
+        float b = qb;
+        float c = qc;
+        float d = qd;
+        float q = Math.round(qq);
+        float a = (float) Math.sqrt(Math.max(1 - b*b - c*c - d*d, 0));
+
+        R[0][0] = Math.round(a*a + b*b - c*c - d*d);
+        R[0][1] = Math.round(2 * (b*c - a*d));
+        R[0][2] = Math.round(2 * (b*d + a*c) * q);
+        R[1][0] = Math.round(2 * (b*c + a*d));
+        R[1][1] = Math.round(a*a + c*c - b*b - d*d);
+        R[1][2] = Math.round(2 * (c*d - a*b) * q);
+        R[2][0] = Math.round(2 * (b*d - a*c));
+        R[2][1] = Math.round(2 * (c*d + a*b));
+        R[2][2] = Math.round((a*a + d*d - b*b - c*c) * q);
+
+        float vox_offset = bb.getFloat(108);
+        dis.skipBytes((int)vox_offset - HEADER_SIZE);
+
+        loadVolume(dis);
+    }
+
+    void loadVolume(DataInputStream dis) throws IOException {
+        ByteBuffer bb;
+        float mult;
+
         ReadableByteChannel chan = Channels.newChannel(dis);
         bb = ByteBuffer.allocate(dim[0] * dim[1] * dim[2] * bytesPerVoxel());
         chan.read(bb);
         bb.rewind();
-		bb.order(BYTE_ORDER);
-//
-//		currentDate = new Date();      
-//        System.out.println(currentDate.getTime() + " - 1st loop");
-		
-		
-		int size = dim[0]*dim[1]*dim[2];
-		System.out.println("Allocating " + size + " bytes");
-		volume = new byte[dim[2]][dim[1]][dim[0]];
-		IntStream ist;
-		int values[];
-		switch (datatype) {
-		case DT_UINT8:
-			ist = IntStream.range(0, size).map(i -> bb.get() & 0xFF);
-			break;
-		case DT_INT16:
-			ist = IntStream.range(0, size).map(i -> bb.getShort());
-			break;
-		case DT_INT32:
-			ist = IntStream.range(0, size).map(i -> bb.getInt());
-			break;
-		case DT_FLOAT32:
-			ist = IntStream.range(0, size).map(i -> (int) bb.getFloat());
-			break;
-		default:
-			QCApp.printStatusMessage("Error unknown data type for volume: " + "volName");
-			return;
-		}
-		
-		values = ist.toArray();
-//
-//		currentDate = new Date();      
-//        System.out.println(currentDate.getTime() + " - end 1st loop - copy");
-        
+        bb.order(BYTE_ORDER);
+
+        int size = dim[0]*dim[1]*dim[2];
+        System.out.println("Allocating " + size + " bytes");
+        volume = new byte[dim[2]][dim[1]][dim[0]];
+        IntStream ist;
+        int values[];
+        switch (datatype) {
+        case DT_UINT8:
+            ist = IntStream.range(0, size).map(i -> bb.get() & 0xFF);
+            break;
+        case DT_INT16:
+            ist = IntStream.range(0, size).map(i -> bb.getShort());
+            break;
+        case DT_INT32:
+            ist = IntStream.range(0, size).map(i -> bb.getInt());
+            break;
+        case DT_FLOAT32:
+            ist = IntStream.range(0, size).map(i -> (int) bb.getFloat());
+            break;
+        default:
+            QCApp.printStatusMessage("Error unknown data type for volume: " + "volName");
+            return;
+        }
+        values = ist.toArray();
         chan.close();
         
 		int[] values2 = Arrays.copyOf(values, values.length);
-//
-//		currentDate = new Date();      
-//        System.out.println(currentDate.getTime() + " - end copy - sort");
         
 		Arrays.sort(values2);
-//
-//		currentDate = new Date();      
-//        System.out.println(currentDate.getTime() + " - end sort");
         
 		float maxval = values2[(int)(dim[0]*dim[1]*dim[2]*.98)];
 		
@@ -232,9 +207,6 @@ class MyVolume {
 			mult = 1;
 		else
 			mult = 255 / maxval;
-//
-//		currentDate = new Date();      
-//        System.out.println(currentDate.getTime() + " - 2nd loop");
         
 		for (int k = 0; k < dim[2]; k += 1)
 			for (int j = 0; j < dim[1]; j += 1)
@@ -245,9 +217,6 @@ class MyVolume {
 					else if (value > 255)
 						volume[k][j][i] = (byte) 255;
 				}
-//
-//		currentDate = new Date();      
-//        System.out.println(currentDate.getTime() + " - end 2nd loop - 3rd loop");
         
 		// Get bounding boxes and maxval
 		for (int m=0; m<boundingBox.length; m++) {
@@ -289,27 +258,8 @@ class MyVolume {
 								boundingBox[m][5] = ks[k+1];
 						}
 					}
-//			// Avoid overflow
-//			if (boundingBox[m][0] < 0)
-//				boundingBox[m][0] = 0;
-//			if (boundingBox[m][1] > dim[0] - 1)
-//				boundingBox[m][1] = dim[0] - 1;
-//			if (boundingBox[m][2] < 0)
-//				boundingBox[m][2] = 0;
-//			if (boundingBox[m][3] > dim[1] - 1)
-//				boundingBox[m][3] = dim[1] - 1;
-//			if (boundingBox[m][4] < 0)
-//				boundingBox[m][4] = 0;
-//			if (boundingBox[m][5] > dim[2] - 1)
-//				boundingBox[m][5] = dim[2] - 1;
 		}
-//
-//		currentDate = new Date();      
-//        System.out.println(currentDate.getTime() + " - end 3rd loop - End loadV");
-        
 	}
-	
-	
 
 	public int getValue(int i, int j, int k)
 	// get value at voxel with index coordinates i,j,k
@@ -319,15 +269,12 @@ class MyVolume {
 		else
 			return 0;
 	}
-
+        
 	public MyVolume(File file, boolean color) {
 		InputStream is = null;
 		this.file = file;
 		this.color = color;
 		String fileName = file.getPath();
-//        
-//		Date currentDate = new Date();      
-//        System.out.println(currentDate.getTime() + " - MyVolume - " + fileName);
         
 		try {
 	        is = new FileInputStream(file);
@@ -352,8 +299,5 @@ class MyVolume {
 				e.printStackTrace();
 			}
 		}
-//		
-//		currentDate = new Date();      
-//        System.out.println(currentDate.getTime() + " - End MyVolume");
 	}
 }

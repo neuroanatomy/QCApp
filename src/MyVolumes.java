@@ -3,13 +3,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 class MyVolumes {
-	public static int MAX_VOLUMES = 25;
-	
-	private List<MyVolume> volumes;
-	
-//	public MyVolume getVolume(String fileName) {
-//		return getVolume(fileName, false);
-//	}
+    public static int MAX_VOLUMES = 25;
+
+    private List<MyVolume> volumes;
 
 	public MyVolume getVolume(File file, boolean color) {
 		for (MyVolume vol : volumes) {

@@ -72,55 +72,55 @@ class MyImages extends JComponent {
 	
 	MyVolumes volumes;
 
-	public MyImages(File subjectDir) {
-		this();
-		renew();
-		QCApp.usePictures = true;
-		changeSubjectDir(subjectDir);
-	}
+    public MyImages(File subjectDir) {
+        this();
+        renew();
+        QCApp.usePictures = true;
+        changeSubjectDir(subjectDir);
+    }
 
-	public MyImages() {
-		this.setPreferredSize(new Dimension(800, 512));
-		this.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				mouseDownOnImage(e);
-			}
-		});
-		this.addMouseMotionListener(new MouseAdapter() {
-			public void mouseDragged(MouseEvent e) {
-				mouseDraggedOnImage(e);
-			}
-		});
-		this.addMouseMotionListener(new MouseAdapter() {
-			public void mouseMoved(MouseEvent e) {
-				mouseMovedOnImage(e);
-			}
-		});
-		this.addMouseListener(new MouseAdapter() {
-			public void mouseReleased(MouseEvent e) {
-				mouseMovedOnImage(e);
-			}
-		});
-		this.addMouseWheelListener(new MouseWheelListener() {
-			public void mouseWheelMoved(MouseWheelEvent e) {
-				mouseWheelRotatedOnImage(e);
-		    }
-		});
-		
-		volumes = new MyVolumes();
-	}
-	
-	public void renew() {
-		cmap = new int[2][256];
-		cname = new String[256];
-		
-		// init greyscale colourmap
-		for (int i = 0; i < cmap[0].length; i++)
-			cmap[0][i] = rgb2value(i, i, i);
+    public MyImages() {
+        this.setPreferredSize(new Dimension(800, 512));
+        this.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                mouseDownOnImage(e);
+            }
+        });
+        this.addMouseMotionListener(new MouseAdapter() {
+            public void mouseDragged(MouseEvent e) {
+                mouseDraggedOnImage(e);
+            }
+        });
+        this.addMouseMotionListener(new MouseAdapter() {
+            public void mouseMoved(MouseEvent e) {
+                mouseMovedOnImage(e);
+            }
+        });
+        this.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                mouseMovedOnImage(e);
+            }
+        });
+        this.addMouseWheelListener(new MouseWheelListener() {
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                mouseWheelRotatedOnImage(e);
+            }
+        });
 
-		// init segmentation label colourmap
-		for (RegionColor regionColor : QCApp.colorLUT) {
-			int No = regionColor.No;
+        volumes = new MyVolumes();
+    }
+
+    public void renew() {
+        cmap = new int[2][256];
+        cname = new String[256];
+
+        // init greyscale colourmap
+        for (int i = 0; i < cmap[0].length; i++)
+            cmap[0][i] = rgb2value(i, i, i);
+
+        // init segmentation label colourmap
+        for (RegionColor regionColor : QCApp.colorLUT) {
+            int No = regionColor.No;
             if (No >= 0 && No <= 255) {
                 cmap[1][No] = rgb2value(regionColor.R, regionColor.G, regionColor.B);
                 cname[No] = regionColor.label;
@@ -205,7 +205,7 @@ class MyImages extends JComponent {
 		// To use image files, call setImages(true)
 		setImages(QCApp.usePictures);
 	}
-
+	
 	private void mouseDownOnImage(MouseEvent e) {
 		int i;
 
@@ -340,7 +340,7 @@ class MyImages extends JComponent {
 		setImages();
 
 		prevSlice = selectedSlice[prevPlane];
-	}
+}
 
 	public static void multMatVec(float[] rV, float[][] M, float[] V) {
 		rV[0] = M[0][0] * V[0] + M[0][1] * V[1] + M[0][2] * V[2];
@@ -377,8 +377,8 @@ class MyImages extends JComponent {
 		rM[2][0] = (M[1][0] * M[2][1] - M[2][0] * M[1][1]) / d;
 		rM[2][1] = (M[2][0] * M[0][1] - M[0][0] * M[2][1]) / d;
 		rM[2][2] = (M[0][0] * M[1][1] - M[1][0] * M[0][1]) / d;
-	}
-
+}
+	
 	static int value2rgb(int v, int cmapindex) {
 		int rgb = 0;
 		
@@ -410,7 +410,6 @@ class MyImages extends JComponent {
 		float tmp[] = new float[3], tmpd[] = new float[3], tmpx[] = new float[3];
 		Rectangle rect = new Rectangle(0, 0, 1, 1);
 		int[][] bounds = new int[2][2];
-
 		// transform volume to view plane
 		switch (plane) {
 		case 0:
@@ -540,13 +539,13 @@ class MyImages extends JComponent {
 		dim1[1] = Math.round(tmpd[1]);
 		dim1[2] = Math.round(tmpd[2]);
 
-		tmp[0] = vol.pixdim[0];
-		tmp[1] = vol.pixdim[1];
-		tmp[2] = vol.pixdim[2];
-		multMatVec(tmpd, T, tmp);
-		pixdim1[0] = Math.abs(tmpd[0]);
-		pixdim1[1] = Math.abs(tmpd[1]);
-		pixdim1[2] = Math.abs(tmpd[2]);
+        tmp[0] = vol.pixdim[0];
+        tmp[1] = vol.pixdim[1];
+        tmp[2] = vol.pixdim[2];
+        multMatVec(tmpd, T, tmp);
+        pixdim1[0] = Math.abs(tmpd[0]);
+        pixdim1[1] = Math.abs(tmpd[1]);
+        pixdim1[2] = Math.abs(tmpd[2]);
 
 		// find bounding box
 		tmp[0] = volRef.boundingBox[0][0];
@@ -592,17 +591,17 @@ class MyImages extends JComponent {
 //					sliceMax = v;
 //			}
 
-		// draw slice
-		theImg = new BufferedImage(rect.width, rect.height, BufferedImage.TYPE_INT_RGB);
-		for (x = 0; x < rect.width; x++)
-			for (y = 0; y < rect.height; y++) {
-				tmp[0] = x + rect.x;
-				tmp[1] = y + rect.y;
-				tmp[2] = z;
-				multMatVec(tmpx, invT, tmp);
-				x1 = Math.round(tmpx[0]);
-				y1 = Math.round(tmpx[1]);
-				z1 = Math.round(tmpx[2]);
+        // draw slice
+        theImg = new BufferedImage(rect.width, rect.height, BufferedImage.TYPE_INT_RGB);
+        for (x = 0; x < rect.width; x++)
+            for (y = 0; y < rect.height; y++) {
+                tmp[0] = x + rect.x;
+                tmp[1] = y + rect.y;
+                tmp[2] = z;
+                multMatVec(tmpx, invT, tmp);
+                x1 = Math.round(tmpx[0]);
+                y1 = Math.round(tmpx[1]);
+                z1 = Math.round(tmpx[2]);
 
 				v = vol.getValue(x1, y1, z1);
 				if (cmapindex == 0)
@@ -640,71 +639,71 @@ class MyImages extends JComponent {
 		return scaleOp.filter(theImg, scaledImg);
 	}
 
-	private BufferedImage drawVolume(MyVolume vol, int plane, int cmapindex) throws Exception {
-		BufferedImage theImg;
-		int x, y, x1, y1, z1, rgb;
-		float z, s0, s1;
-		int v;
-		float[][] P;//, invP = new float[3][3];
-		float[][] T = new float[3][3], invT = new float[3][3];
-		float[] tmp = new float[3], tmpd = new float[3], tmpx = new float[3];
-		float[] pixdim1 = new float[3];
-		int r, g, b;
-		Rectangle rect = new Rectangle(0, 0, 0, 0);
-		int[][] bounds = new int[3][2];
+    private BufferedImage drawVolume(MyVolume vol, int plane, int cmapindex) throws Exception {
+        BufferedImage theImg;
+        int x, y, x1, y1, z1, rgb;
+        float z, s0, s1;
+        int v;
+        float[][] P;//, invP = new float[3][3];
+        float[][] T = new float[3][3], invT = new float[3][3];
+        float[] tmp = new float[3], tmpd = new float[3], tmpx = new float[3];
+        float[] pixdim1 = new float[3];
+        int r, g, b;
+        Rectangle rect = new Rectangle(0, 0, 0, 0);
+        int[][] bounds = new int[3][2];
 
-		// transform volume to view plane
-		switch (plane) {
-		case 0:
-			P = X;
-			break;
-		case 1:
-			P = Y;
-			break;
-		case 2:
-			P = Z;
-			break;
-		default:
-			throw new Exception("No plane selected");
-		}
-		
-		multMat(T, P, vol.R);
-		invMat(invT, T);
-		// multMat(invT, vol.S, invP);
-		// invMat(T, invT);
+        // transform volume to view plane
+        switch (plane) {
+        case 0:
+            P = X;
+            break;
+        case 1:
+            P = Y;
+            break;
+        case 2:
+            P = Z;
+            break;
+        default:
+            throw new Exception("No plane selected");
+        }
 
-		// find dimension of pixels
-		tmp[0] = vol.pixdim[0];
-		tmp[1] = vol.pixdim[1];
-		tmp[2] = vol.pixdim[2];
-		multMatVec(tmpd, T, tmp);
-		pixdim1[0] = Math.abs(tmpd[0]);
-		pixdim1[1] = Math.abs(tmpd[1]);
-		pixdim1[2] = Math.abs(tmpd[2]);
+        multMat(T, P, vol.R);
+        invMat(invT, T);
+        // multMat(invT, vol.S, invP);
+        // invMat(T, invT);
 
-		// find 1st and last non-empty slices (for lighting) and bounding box
-		tmp[0] = vol.boundingBox[cmapindex][0];
-		tmp[1] = vol.boundingBox[cmapindex][2];
-		tmp[2] = vol.boundingBox[cmapindex][4];
-		multMatVec(tmpd, T, tmp);
-		bounds[0][0] = Math.round(tmpd[0]);
-		bounds[1][0] = Math.round(tmpd[1]);
-		bounds[2][0] = Math.round(tmpd[2]);
-		tmp[0] = vol.boundingBox[cmapindex][1];
-		tmp[1] = vol.boundingBox[cmapindex][3];
-		tmp[2] = vol.boundingBox[cmapindex][5];
-		multMatVec(tmpd, T, tmp);
-		bounds[0][1] = Math.round(tmpd[0]);
-		bounds[1][1] = Math.round(tmpd[1]);
-		bounds[2][1] = Math.round(tmpd[2]);
+        // find dimension of pixels
+        tmp[0] = vol.pixdim[0];
+        tmp[1] = vol.pixdim[1];
+        tmp[2] = vol.pixdim[2];
+        multMatVec(tmpd, T, tmp);
+        pixdim1[0] = Math.abs(tmpd[0]);
+        pixdim1[1] = Math.abs(tmpd[1]);
+        pixdim1[2] = Math.abs(tmpd[2]);
 
-		rect.x = Math.min(bounds[0][0], bounds[0][1]);
-		rect.y = Math.min(bounds[1][0], bounds[1][1]);
-		rect.width = Math.max(bounds[0][0], bounds[0][1]) - rect.x + 1;
-		rect.height = Math.max(bounds[1][0], bounds[1][1]) - rect.y + 1;
-		
-		s0 = Math.min(bounds[2][0], bounds[2][1]); // 1st
-		s1 = Math.max(bounds[2][0], bounds[2][1]); // last
+        // find 1st and last non-empty slices (for lighting) and bounding box
+        tmp[0] = vol.boundingBox[cmapindex][0];
+        tmp[1] = vol.boundingBox[cmapindex][2];
+        tmp[2] = vol.boundingBox[cmapindex][4];
+        multMatVec(tmpd, T, tmp);
+        bounds[0][0] = Math.round(tmpd[0]);
+        bounds[1][0] = Math.round(tmpd[1]);
+        bounds[2][0] = Math.round(tmpd[2]);
+        tmp[0] = vol.boundingBox[cmapindex][1];
+        tmp[1] = vol.boundingBox[cmapindex][3];
+        tmp[2] = vol.boundingBox[cmapindex][5];
+        multMatVec(tmpd, T, tmp);
+        bounds[0][1] = Math.round(tmpd[0]);
+        bounds[1][1] = Math.round(tmpd[1]);
+        bounds[2][1] = Math.round(tmpd[2]);
+
+        rect.x = Math.min(bounds[0][0], bounds[0][1]);
+        rect.y = Math.min(bounds[1][0], bounds[1][1]);
+        rect.width = Math.max(bounds[0][0], bounds[0][1]) - rect.x + 1;
+        rect.height = Math.max(bounds[1][0], bounds[1][1]) - rect.y + 1;
+
+        s0 = Math.min(bounds[2][0], bounds[2][1]); // 1st
+        s1 = Math.max(bounds[2][0], bounds[2][1]); // last
 
 		// draw volume
 		theImg = new BufferedImage(rect.width, rect.height, BufferedImage.TYPE_INT_RGB);
@@ -743,47 +742,18 @@ class MyImages extends JComponent {
 		at.translate(margin, margin);
 		AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
 		return scaleOp.filter(theImg, scaledImg);
-	}
+}
 
-	private BufferedImage drawErrorSlice() {
-		BufferedImage theImg = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
-		Graphics2D g2 = theImg.createGraphics();
+    private BufferedImage drawErrorSlice() {
+        BufferedImage theImg = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2 = theImg.createGraphics();
 
-		g2.setFont(new Font("Helvetica", Font.BOLD, 14));
-		g2.drawString("UNAVAILABLE", 15, 64);
-		g2.drawRect(1, 1, 126, 126);
+        g2.setFont(new Font("Helvetica", Font.BOLD, 14));
+        g2.drawString("UNAVAILABLE", 15, 64);
+        g2.drawRect(1, 1, 126, 126);
 
-		return theImg;
-	}
-
-//	private String getVolumeName(String name) {
-//		return name.substring(0, name.length() - 8);
-//	}
-//
-//	private String getPlaneName(String name) {
-//		return name.substring(name.length() - 1, name.length());
-//	}
-	
-//	private int getPlane(String name) {
-//		String volPlane = getPlaneName(name);
-//		int plane = -1;
-//		if (volPlane.equals("X"))
-//			plane = 0;
-//		if (volPlane.equals("Y"))
-//			plane = 1;
-//		if (volPlane.equals("Z"))
-//			plane = 2;
-//		
-//		return plane;
-//	}
-
-//	private String getImageTypeName(String name) {
-//		return name.substring(name.length() - 4, name.length() - 2);
-//	}
-//
-//	private int getCMapIndex(String name) {
-//		return Integer.parseInt(name.substring(name.length() - 6, name.length() - 5));
-//	}
+        return theImg;
+    }
 
 	public void paint(Graphics g) {
 		Dimension dim = this.getSize();
@@ -859,8 +829,8 @@ class MyImages extends JComponent {
 			width = fm.stringWidth(toggleStr);
 			g.drawString(toggleStr, 10 + (60 - width) / 2, 10 + 20 - (20 - height) / 2 - 3);
 		}
-	}
-	
+}
+					
 	public int setImages() {
 		return setImages(false);
 	}
@@ -970,7 +940,7 @@ class MyImages extends JComponent {
 		initialized = true;
 
 		return err;
-	}
+}
 	
 	public void updatePositionLabel() {
 		if (QCApp.positionLabel != null)
