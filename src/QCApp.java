@@ -58,7 +58,6 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.io.FileHandler;
 import org.apache.commons.configuration2.tree.ImmutableNode;
 
-
 public class QCApp {
 
     static private class MyTableModel extends DefaultTableModel {
@@ -68,10 +67,11 @@ public class QCApp {
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
 
-            //here the columns 0 and 2 are non-editable
-            if (columnIndex == 0 || columnIndex == 2) return false;
+            // here the columns 0 and 2 are non-editable
+            if (columnIndex == 0 || columnIndex == 2)
+                return false;
 
-            //the rest is editable
+            // the rest is editable
             return true;
         }
     }
@@ -190,10 +190,8 @@ public class QCApp {
     public static void chooseDirectory() throws IOException {
         List<String> subjects = new ArrayList<String>();
         if (tableChanged) {
-            int ans = JOptionPane.showConfirmDialog(f,
-                    "Do you want to save QC before changing subject directory?", "Save QC?",
-                    JOptionPane.YES_NO_CANCEL_OPTION,
-                    JOptionPane.QUESTION_MESSAGE);
+            int ans = JOptionPane.showConfirmDialog(f, "Do you want to save QC before changing subject directory?",
+                    "Save QC?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (ans == JOptionPane.YES_OPTION) {
                 if (!saveQC())
                     return;
@@ -202,16 +200,16 @@ public class QCApp {
         }
 
         // Detect configuration files
-        configDir = Paths.get(QCApp.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent().resolve("config");
-        configFiles = Files.list(configDir)
-                 .filter(Files::isRegularFile)
-                 .filter(path -> path.toString().endsWith(".xml"))
-                 .map(Path::toFile)
-                 .sorted(Comparator.comparing(file -> file.getName().substring(0, file.getName().length() - 4)))
-                 .collect(Collectors.toList());
+        configDir = Paths.get(QCApp.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent()
+                .resolve("config");
+        configFiles = Files.list(configDir).filter(Files::isRegularFile)
+                .filter(path -> path.toString().endsWith(".xml")).map(Path::toFile)
+                .sorted(Comparator.comparing(file -> file.getName().substring(0, file.getName().length() - 4)))
+                .collect(Collectors.toList());
 
         // Configuration Combo Box
-        String[] configNames = configFiles.stream().map(file -> file.getName().substring(0, file.getName().length() - 4)).toArray(String[]::new);
+        String[] configNames = configFiles.stream()
+                .map(file -> file.getName().substring(0, file.getName().length() - 4)).toArray(String[]::new);
         configList = new JComboBox<String>(configNames);
 
         // Configuration Combo Box Label
@@ -316,8 +314,10 @@ public class QCApp {
                             break;
 
                     if (i < 0) {
-                        System.out.println("Warning: " + qcfile + "subject " + sub + " not found in subjects directory.");
-                        printStatusMessage("Warning: " + qcfile + "subject " + sub + " not found in subjects directory.");
+                        System.out
+                                .println("Warning: " + qcfile + "subject " + sub + " not found in subjects directory.");
+                        printStatusMessage(
+                                "Warning: " + qcfile + "subject " + sub + " not found in subjects directory.");
                         continue;
                     }
                     model.setValueAt(qc, i, 1);
@@ -390,7 +390,8 @@ public class QCApp {
             setTableChanged(false);
         } catch (IOException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(f, "Failed to save QC file: " + file, "Save failed", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(f, "Failed to save QC file: " + file, "Save failed",
+                    JOptionPane.ERROR_MESSAGE);
             return false;
         }
         printStatusMessage("QC file saved.");
@@ -414,13 +415,13 @@ public class QCApp {
     }
 
     private static void updateZoom() {
-        zoom = zoomSlider.getValue()/100.;
+        zoom = zoomSlider.getValue() / 100.;
         zoomValueLabel.setText("x" + String.format("%.2f", zoom));
         images.repaint();
     }
 
     private static void updateOpacity() {
-        opacity = opacitySlider.getValue()/100f;
+        opacity = opacitySlider.getValue() / 100f;
         opacityValueLabel.setText(String.format("%.2f", opacity));
         if (images.initialized)
             images.setImages();
@@ -433,20 +434,16 @@ public class QCApp {
         f.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 if (tableChanged) {
-                    int ans = JOptionPane.showConfirmDialog(f,
-                            "Do you want to save QC before closing?", "Save QC?",
-                            JOptionPane.YES_NO_CANCEL_OPTION,
-                            JOptionPane.QUESTION_MESSAGE);
+                    int ans = JOptionPane.showConfirmDialog(f, "Do you want to save QC before closing?", "Save QC?",
+                            JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
                     if (ans == JOptionPane.YES_OPTION) {
                         if (saveQC())
                             System.exit(0);
                     } else if (ans == JOptionPane.NO_OPTION)
                         System.exit(0);
                 } else {
-                    int ans = JOptionPane.showConfirmDialog(f,
-                            "Are you sure to close this window?", "Really Closing?",
-                            JOptionPane.YES_NO_OPTION,
-                            JOptionPane.QUESTION_MESSAGE);
+                    int ans = JOptionPane.showConfirmDialog(f, "Are you sure you want to close this window?",
+                            "Really Close?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                     if (ans == JOptionPane.YES_OPTION)
                         System.exit(0);
                 }
@@ -464,7 +461,8 @@ public class QCApp {
                 try {
                     chooseDirectory();
                 } catch (IOException e1) {
-                    JOptionPane.showMessageDialog(null, "Error listing configuration files", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Error listing configuration files", "Error",
+                            JOptionPane.ERROR_MESSAGE);
                     e1.printStackTrace();
                 }
             }
@@ -590,44 +588,28 @@ public class QCApp {
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
         layout.setHorizontalGroup(layout.createParallelGroup()
-                .addGroup(layout.createSequentialGroup()
-                        .addComponent(chooseButton)
-                        .addComponent(loadButton)
-                        .addComponent(saveButton)
-                        .addComponent(zoomLabel)
-                        .addComponent(zoomSlider, 50, 100, 100)
-                        .addComponent(zoomValueLabel)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 15, 15)
-                        .addComponent(opacityLabel)
-                        .addComponent(opacitySlider, 50, 100, 100)
-                        .addComponent(opacityValueLabel)
-                        .addComponent(usePicturesButton)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(positionLabel)
-                        )
-                .addComponent(splitPane)
-                .addComponent(status, GroupLayout.Alignment.LEADING));
+                .addGroup(layout.createSequentialGroup().addComponent(chooseButton).addComponent(loadButton)
+                        .addComponent(saveButton).addComponent(zoomLabel).addComponent(zoomSlider, 50, 100, 100)
+                        .addComponent(zoomValueLabel).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 15, 15)
+                        .addComponent(opacityLabel).addComponent(opacitySlider, 50, 100, 100)
+                        .addComponent(opacityValueLabel).addComponent(usePicturesButton)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE,
+                                Short.MAX_VALUE)
+                        .addComponent(positionLabel))
+                .addComponent(splitPane).addComponent(status, GroupLayout.Alignment.LEADING));
         layout.setVerticalGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
-                        .addComponent(chooseButton)
-                        .addComponent(loadButton)
-                        .addComponent(saveButton)
-                        .addComponent(zoomLabel)
-                        .addComponent(zoomSlider)
-                        .addComponent(zoomValueLabel)
-                        .addComponent(opacityLabel)
-                        .addComponent(opacitySlider)
-                        .addComponent(opacityValueLabel)
-                        .addComponent(usePicturesButton)
-                        .addComponent(positionLabel)
-                        )
-                .addComponent(splitPane)
-                .addComponent(status, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE));
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER).addComponent(chooseButton)
+                        .addComponent(loadButton).addComponent(saveButton).addComponent(zoomLabel)
+                        .addComponent(zoomSlider).addComponent(zoomValueLabel).addComponent(opacityLabel)
+                        .addComponent(opacitySlider).addComponent(opacityValueLabel).addComponent(usePicturesButton)
+                        .addComponent(positionLabel))
+                .addComponent(splitPane).addComponent(status, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE,
+                        GroupLayout.PREFERRED_SIZE));
         f.pack();
         f.setVisible(true);
     }
 
-    public static void main(String[] args) throws NumberFormatException, IOException, ConfigurationException{
+    public static void main(String[] args) throws NumberFormatException, IOException, ConfigurationException {
 
         if (args.length == 2) {
             File configFile = new File(args[0]);

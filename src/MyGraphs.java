@@ -56,8 +56,7 @@ class MyGraphs extends JComponent {
                     g2.setColor(new Color(0.0f, 1.0f + val, -val));
                 else
                     g2.setColor(Color.white);
-            }
-            else
+            } else
                 g2.setColor(Color.white);
             g2.fillRect(x[i][0], 0, x[i][1], dim.height);
             g2.setColor(Color.black);
@@ -90,7 +89,8 @@ class MyGraphs extends JComponent {
         for (i = 0; i < NB_REGIONS; i++)
             if (mean[i] != 0) {
                 g2.rotate(Math.PI / 2.0);
-                g2.drawGlyphVector(g2.getFont().createGlyphVector(frc, regions.get(i)), 5, -(x[i][0] + x[i][1] - g2.getFont().getSize() / 2) / 2);
+                g2.drawGlyphVector(g2.getFont().createGlyphVector(frc, regions.get(i)), 5,
+                        -(x[i][0] + x[i][1] - g2.getFont().getSize() / 2) / 2);
                 g2.rotate(-Math.PI / 2.0);
             }
     }
@@ -144,7 +144,7 @@ class MyGraphs extends JComponent {
 
         NB_REGIONS = QCApp.colorLUT.size() + QCApp.measures.length;
         regions = new ArrayList<String>(Arrays.asList(QCApp.measures));
-        //regions.addAll(Arrays.asList(QCApp.measures));
+        // regions.addAll(Arrays.asList(QCApp.measures));
         for (RegionColor regionColor : QCApp.colorLUT) {
             regions.add(regionColor.label);
         }
@@ -162,7 +162,7 @@ class MyGraphs extends JComponent {
 
         this.subjectsDir = subjectsDir;
 
-        for (i=0; i<subjects.size(); i++) {
+        for (i = 0; i < subjects.size(); i++) {
             QCApp.printStatusMessage("Configuring stat graphs... " + (i + 1) + "/" + subjects.size());
             err = getVolumesForSubject(subjects.get(i), x);
             if (err == 1) {

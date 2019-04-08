@@ -7,8 +7,8 @@ class MyImage {
     public String volbackall;
     private int plane;
 
-    public MyImage(String volName, boolean color, String effect, String output,
-            String volback, String volbackall, int plane) {
+    public MyImage(String volName, boolean color, String effect, String output, String volback, String volbackall,
+            int plane) {
         this.volName = volName;
         this.color = color;
         this.effect = effect;
