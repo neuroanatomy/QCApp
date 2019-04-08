@@ -58,7 +58,6 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.io.FileHandler;
 import org.apache.commons.configuration2.tree.ImmutableNode;
 
-
 public class QCApp {
 
     static private class MyTableModel extends DefaultTableModel {
@@ -68,10 +67,11 @@ public class QCApp {
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
 
-            //here the columns 0 and 2 are non-editable
-            if (columnIndex == 0 || columnIndex == 2) return false;
+            // here the columns 0 and 2 are non-editable
+            if (columnIndex == 0 || columnIndex == 2)
+                return false;
 
-            //the rest is editable
+            // the rest is editable
             return true;
         }
     }
@@ -190,10 +190,8 @@ public class QCApp {
     public static void chooseDirectory() throws IOException {
         List<String> subjects = new ArrayList<String>();
         if (tableChanged) {
-            int ans = JOptionPane.showConfirmDialog(f,
-                    "Do you want to save QC before changing subject directory?", "Save QC?",
-                    JOptionPane.YES_NO_CANCEL_OPTION,
-                    JOptionPane.QUESTION_MESSAGE);
+            int ans = JOptionPane.showConfirmDialog(f, "Do you want to save QC before changing subject directory?",
+                    "Save QC?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (ans == JOptionPane.YES_OPTION) {
                 if (!saveQC())
                     return;
@@ -202,16 +200,16 @@ public class QCApp {
         }
 
         // Detect configuration files
-        configDir = Paths.get(QCApp.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent().resolve("config");
-        configFiles = Files.list(configDir)
-                 .filter(Files::isRegularFile)
-                 .filter(path -> path.toString().endsWith(".xml"))
-                 .map(Path::toFile)
-                 .sorted(Comparator.comparing(file -> file.getName().substring(0, file.getName().length() - 4)))
-                 .collect(Collectors.toList());
+        configDir = Paths.get(QCApp.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent()
+                .resolve("config");
+        configFiles = Files.list(configDir).filter(Files::isRegularFile)
+                .filter(path -> path.toString().endsWith(".xml")).map(Path::toFile)
+                .sorted(Comparator.comparing(file -> file.getName().substring(0, file.getName().length() - 4)))
+                .collect(Collectors.toList());
 
         // Configuration Combo Box
-        String[] configNames = configFiles.stream().map(file -> file.getName().substring(0, file.getName().length() - 4)).toArray(String[]::new);
+        String[] configNames = configFiles.stream()
+                .map(file -> file.getName().substring(0, file.getName().length() - 4)).toArray(String[]::new);
         configList = new JComboBox<String>(configNames);
 
         // Configuration Combo Box Label
@@ -316,8 +314,10 @@ public class QCApp {
                             break;
 
                     if (i < 0) {
-                        System.out.println("Warning: " + qcfile + "subject " + sub + " not found in subjects directory.");
-                        printStatusMessage("Warning: " + qcfile + "subject " + sub + " not found in subjects directory.");
+                        System.out
+                                .println("Warning: " + qcfile + "subject " + sub + " not found in subjects directory.");
+                        printStatusMessage(
+                                "Warning: " + qcfile + "subject " + sub + " not found in subjects directory.");
                         continue;
                     }
                     model.setValueAt(qc, i, 1);
@@ -342,302 +342,284 @@ public class QCApp {
             }
     }
 
-	public static boolean saveQC() {
-		// Save QC
-		final JFileChooser fc = new JFileChooser();
-		fc.setCurrentDirectory(subjectsDir);
-		fc.setSelectedFile(new File(qcfile));
-		fc.setDialogTitle("Save QC File...");
-		int returnVal = fc.showSaveDialog(null);
-		if (returnVal != JFileChooser.APPROVE_OPTION)
-			return false;
+    public static boolean saveQC() {
+        // Save QC
+        final JFileChooser fc = new JFileChooser();
+        fc.setCurrentDirectory(subjectsDir);
+        fc.setSelectedFile(new File(qcfile));
+        fc.setDialogTitle("Save QC File...");
+        int returnVal = fc.showSaveDialog(null);
+        if (returnVal != JFileChooser.APPROVE_OPTION)
+            return false;
 
-		File file = fc.getSelectedFile();
-		try {
-			int i, j;
-			double x[] = new double[MyGraphs.NB_REGIONS];
-			Writer output = new BufferedWriter(new FileWriter(file));
-			String sub;
+        File file = fc.getSelectedFile();
+        try {
+            int i, j;
+            double x[] = new double[MyGraphs.NB_REGIONS];
+            Writer output = new BufferedWriter(new FileWriter(file));
+            String sub;
 
-			output.write("Subject\tQC\tComments\t");
-			for (j = 0; j < MyGraphs.NB_REGIONS; j++) {
-				if (graphs.mean[j] == 0)
-					continue;
-				if (j < MyGraphs.NB_REGIONS - 1)
-					output.write(MyGraphs.regions.get(j) + "\t");
-				else
-					output.write(MyGraphs.regions.get(j) + "\n");
-			}
+            output.write("Subject\tQC\tComments\t");
+            for (j = 0; j < MyGraphs.NB_REGIONS; j++) {
+                if (graphs.mean[j] == 0)
+                    continue;
+                if (j < MyGraphs.NB_REGIONS - 1)
+                    output.write(MyGraphs.regions.get(j) + "\t");
+                else
+                    output.write(MyGraphs.regions.get(j) + "\n");
+            }
 
-			for (i = 0; i < model.getRowCount(); i++) {
-				sub = model.getValueAt(i, 2).toString();
-				output.write(sub + "\t"); // Subject
-				output.write(model.getValueAt(i, 1).toString() + "\t"); // QC
-				output.write(model.getValueAt(i, 3).toString() + "\t"); // Comments
-				
-				printStatusMessage("Saving volumetric data for subject " + (i + 1) + "/" + model.getRowCount());
-				graphs.getVolumesForSubject(sub, x); // Volumes
-				for (j = 0; j < MyGraphs.NB_REGIONS; j++) {
-					if (graphs.mean[j] == 0)
-						continue;
-					if (j < MyGraphs.NB_REGIONS - 1)
-						output.write(x[j] + "\t");
-					else
-						output.write(x[j] + "\n");
-				}
-			}
-			output.close();
-			setTableChanged(false);
-		} catch (IOException e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(f, "Failed to save QC file: " + file, "Save failed", JOptionPane.ERROR_MESSAGE);
-			return false;
-		}
-		printStatusMessage("QC file saved.");
-		return true;
-	}
-	
-	public static void loadQC() {
-		// Load QC
-		final JFileChooser fc = new JFileChooser();
-		fc.setCurrentDirectory(subjectsDir);
-		fc.setSelectedFile(new File(qcfile));
-		fc.setDialogTitle("load QC File...");
-		int returnVal = fc.showOpenDialog(null);
-		if (returnVal != JFileChooser.APPROVE_OPTION)
-			return;
-		
-		File file = fc.getSelectedFile();
-		System.out.println("Loading QC file " + file.getName());
-		readQC(file);
-		setTableChanged(false);
-	}
-	
-	private static void updateZoom() {
-		zoom = zoomSlider.getValue()/100.;
-		zoomValueLabel.setText("x" + String.format("%.2f", zoom));
-		images.repaint();
-	}
-	
-	private static void updateOpacity() {
-		opacity = opacitySlider.getValue()/100f;
-		opacityValueLabel.setText(String.format("%.2f", opacity));
-		if (images.initialized)
-			images.setImages();
-		images.repaint();
-}
+            for (i = 0; i < model.getRowCount(); i++) {
+                sub = model.getValueAt(i, 2).toString();
+                output.write(sub + "\t"); // Subject
+                output.write(model.getValueAt(i, 1).toString() + "\t"); // QC
+                output.write(model.getValueAt(i, 3).toString() + "\t"); // Comments
 
-	public static void createAndShowGUI() {
-		f = new JFrame("QCApp");
-		f.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		f.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-				if (tableChanged) {
-			        int ans = JOptionPane.showConfirmDialog(f, 
-			                "Do you want to save QC before closing?", "Save QC?", 
-			                JOptionPane.YES_NO_CANCEL_OPTION,
-			                JOptionPane.QUESTION_MESSAGE);
-			        if (ans == JOptionPane.YES_OPTION) {
-			        	if (saveQC())
-			        		System.exit(0);
-			        } else if (ans == JOptionPane.NO_OPTION)
-				    	System.exit(0);
-				} else {
-			        int ans = JOptionPane.showConfirmDialog(f, 
-			                "Are you sure you want to close this window?", "Really Close?", 
-			                JOptionPane.YES_NO_OPTION,
-			                JOptionPane.QUESTION_MESSAGE);
-			        if (ans == JOptionPane.YES_OPTION)
-			        	System.exit(0);
-				}
-			}
-		});
-
-		// Status text
-		status = new JTextArea("Choose a Subjects Directory");
-		status.setOpaque(false);
-
-		// Choose Button
-		chooseButton = new JButton("Choose Subjects Directory...");
-		chooseButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					chooseDirectory();
-				} catch (IOException e1) {
-					JOptionPane.showMessageDialog(null, "Error listing configuration files", "Error", JOptionPane.ERROR_MESSAGE);
-					e1.printStackTrace();
-				}
-			}
-		});
-
-		// Save Button
-		saveButton = new JButton("Save QC...");
-		saveButton.setEnabled(false);
-		saveButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				saveQC();
-			}
-		});
-
-		// Load Button
-		loadButton = new JButton("Load QC...");
-		loadButton.setEnabled(false);
-		loadButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				loadQC();
-			}
-		});
-		
-		// Position Label
-		positionLabel = new JLabel();
-		
-		// Zoom slider
-		zoomSlider = new JSlider(JSlider.HORIZONTAL, 50, 400, 200);
-		zoomSlider.setMajorTickSpacing(50);
-		zoomSlider.setMinorTickSpacing(5);
-		zoomSlider.setBorder(BorderFactory.createEmptyBorder(0, -5, 0, -5));
-		zoomSlider.setPaintTicks(false);
-		zoomSlider.setPaintLabels(false);
-		zoomSlider.setSnapToTicks(true);
-		zoomSlider.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				updateZoom();
-			}
-		});
-		zoomLabel = new JLabel("Zoom:");
-		zoomValueLabel = new JLabel();
-		
-		// Opacity slider
-		opacitySlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);
-		opacitySlider.setMajorTickSpacing(20);
-		opacitySlider.setMinorTickSpacing(2);
-		opacitySlider.setBorder(BorderFactory.createEmptyBorder(0, -5, 0, -5));
-		opacitySlider.setPaintTicks(false);
-		opacitySlider.setPaintLabels(false);
-		opacitySlider.setSnapToTicks(true);
-		opacitySlider.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				updateOpacity();
-			}
-		});
-		opacityLabel = new JLabel("Opacity:");
-		opacityValueLabel = new JLabel();
-		
-		usePicturesButton = new JCheckBox("pics");
-		usePicturesButton.setMnemonic(KeyEvent.VK_P);
-		usePicturesButton.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				usePictures = usePicturesButton.isSelected();
-			}
-		});
-
-		// Table
-		model = new MyTableModel();
-		table = new JTable(model);
-		model.addColumn("#");
-		model.addColumn("QC");
-		model.addColumn("Subject");
-		model.addColumn("Comments");
-		model.addTableModelListener(new TableModelListener() {
-			public void tableChanged(TableModelEvent e) {
-				if (e.getColumn() >= 0)
-					setTableChanged(true);
-			}
-		});
-		table.setCellSelectionEnabled(true);
-		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		table.setPreferredScrollableViewportSize(new Dimension(250, 70));
-		table.setFillsViewportHeight(true);
-		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent e) {
-				if (!e.getValueIsAdjusting())
-					selectSubject(table);
-			}
-		});
-		JScrollPane scrollPane = new JScrollPane(table);
-		table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
-		table.getColumnModel().getColumn(0).setMinWidth(32);
-		table.getColumnModel().getColumn(1).setMinWidth(32);
-		table.getColumnModel().getColumn(2).setPreferredWidth(800);
-		table.getColumnModel().getColumn(3).setPreferredWidth(800);
-
-		// Graphs
-		graphs = new MyGraphs();
-		graphs.setPreferredSize(new Dimension(250, 250));
-
-		// Image
-		images = new MyImages();
-		JScrollPane imagesScrollPane = new JScrollPane(images);
-
-		updateZoom();
-		updateOpacity();
-
-		// Split Pane for Table and Graphs
-		JSplitPane splitPaneForTableAndGraphs = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrollPane, graphs);
-		splitPaneForTableAndGraphs.setOneTouchExpandable(true);
-		splitPaneForTableAndGraphs.setDividerLocation(350);
-		splitPaneForTableAndGraphs.setResizeWeight(1.0);
-
-		// Split Pane for the previous and Images
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitPaneForTableAndGraphs,
-				imagesScrollPane);
-		splitPane.setOneTouchExpandable(true);
-		splitPane.setDividerLocation(350);
-
-		// Layout the GUI
-		GroupLayout layout = new GroupLayout(f.getContentPane());
-		f.getContentPane().setLayout(layout);
-		layout.setAutoCreateGaps(true);
-		layout.setAutoCreateContainerGaps(true);
-		layout.setHorizontalGroup(layout.createParallelGroup()
-				.addGroup(layout.createSequentialGroup()
-						.addComponent(chooseButton)
-						.addComponent(loadButton)
-						.addComponent(saveButton)
-						.addComponent(zoomLabel)
-						.addComponent(zoomSlider, 50, 100, 100)
-						.addComponent(zoomValueLabel)
-						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 15, 15)
-						.addComponent(opacityLabel)
-						.addComponent(opacitySlider, 50, 100, 100)
-						.addComponent(opacityValueLabel)
-						.addComponent(usePicturesButton)
-						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(positionLabel)
-						)
-				.addComponent(splitPane)
-				.addComponent(status, GroupLayout.Alignment.LEADING));
-		layout.setVerticalGroup(layout.createSequentialGroup()
-				.addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
-						.addComponent(chooseButton)
-						.addComponent(loadButton)
-						.addComponent(saveButton)
-						.addComponent(zoomLabel)
-						.addComponent(zoomSlider)
-						.addComponent(zoomValueLabel)
-						.addComponent(opacityLabel)
-						.addComponent(opacitySlider)
-						.addComponent(opacityValueLabel)
-						.addComponent(usePicturesButton)
-						.addComponent(positionLabel)
-						)
-				.addComponent(splitPane)
-				.addComponent(status, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE));
-		f.pack();
-f.setVisible(true);
+                printStatusMessage("Saving volumetric data for subject " + (i + 1) + "/" + model.getRowCount());
+                graphs.getVolumesForSubject(sub, x); // Volumes
+                for (j = 0; j < MyGraphs.NB_REGIONS; j++) {
+                    if (graphs.mean[j] == 0)
+                        continue;
+                    if (j < MyGraphs.NB_REGIONS - 1)
+                        output.write(x[j] + "\t");
+                    else
+                        output.write(x[j] + "\n");
+                }
+            }
+            output.close();
+            setTableChanged(false);
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(f, "Failed to save QC file: " + file, "Save failed",
+                    JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        printStatusMessage("QC file saved.");
+        return true;
     }
 
-	public static void main(String[] args) throws NumberFormatException, IOException, ConfigurationException{
-    	
-		if (args.length == 2) {
-			File configFile = new File(args[0]);
-			loadConfiguration(configFile);
-			File dir = new File(args[1]);
-			images = new MyImages(dir);
-			// images.changeSubjectDir(dir.getPath(), true);
-		} else {
-			new QCApp();
-			createAndShowGUI();
-		}
-	}
+    public static void loadQC() {
+        // Load QC
+        final JFileChooser fc = new JFileChooser();
+        fc.setCurrentDirectory(subjectsDir);
+        fc.setSelectedFile(new File(qcfile));
+        fc.setDialogTitle("load QC File...");
+        int returnVal = fc.showOpenDialog(null);
+        if (returnVal != JFileChooser.APPROVE_OPTION)
+            return;
+
+        File file = fc.getSelectedFile();
+        System.out.println("Loading QC file " + file.getName());
+        readQC(file);
+        setTableChanged(false);
+    }
+
+    private static void updateZoom() {
+        zoom = zoomSlider.getValue() / 100.;
+        zoomValueLabel.setText("x" + String.format("%.2f", zoom));
+        images.repaint();
+    }
+
+    private static void updateOpacity() {
+        opacity = opacitySlider.getValue() / 100f;
+        opacityValueLabel.setText(String.format("%.2f", opacity));
+        if (images.initialized)
+            images.setImages();
+        images.repaint();
+    }
+
+    public static void createAndShowGUI() {
+        f = new JFrame("QCApp");
+        f.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        f.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                if (tableChanged) {
+                    int ans = JOptionPane.showConfirmDialog(f, "Do you want to save QC before closing?", "Save QC?",
+                            JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    if (ans == JOptionPane.YES_OPTION) {
+                        if (saveQC())
+                            System.exit(0);
+                    } else if (ans == JOptionPane.NO_OPTION)
+                        System.exit(0);
+                } else {
+                    int ans = JOptionPane.showConfirmDialog(f, "Are you sure you want to close this window?",
+                            "Really Close?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    if (ans == JOptionPane.YES_OPTION)
+                        System.exit(0);
+                }
+            }
+        });
+
+        // Status text
+        status = new JTextArea("Choose a Subjects Directory");
+        status.setOpaque(false);
+
+        // Choose Button
+        chooseButton = new JButton("Choose Subjects Directory...");
+        chooseButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    chooseDirectory();
+                } catch (IOException e1) {
+                    JOptionPane.showMessageDialog(null, "Error listing configuration files", "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    e1.printStackTrace();
+                }
+            }
+        });
+
+        // Save Button
+        saveButton = new JButton("Save QC...");
+        saveButton.setEnabled(false);
+        saveButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                saveQC();
+            }
+        });
+
+        // Load Button
+        loadButton = new JButton("Load QC...");
+        loadButton.setEnabled(false);
+        loadButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                loadQC();
+            }
+        });
+
+        // Position Label
+        positionLabel = new JLabel();
+
+        // Zoom slider
+        zoomSlider = new JSlider(JSlider.HORIZONTAL, 50, 400, 200);
+        zoomSlider.setMajorTickSpacing(50);
+        zoomSlider.setMinorTickSpacing(5);
+        zoomSlider.setBorder(BorderFactory.createEmptyBorder(0, -5, 0, -5));
+        zoomSlider.setPaintTicks(false);
+        zoomSlider.setPaintLabels(false);
+        zoomSlider.setSnapToTicks(true);
+        zoomSlider.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                updateZoom();
+            }
+        });
+        zoomLabel = new JLabel("Zoom:");
+        zoomValueLabel = new JLabel();
+
+        // Opacity slider
+        opacitySlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);
+        opacitySlider.setMajorTickSpacing(20);
+        opacitySlider.setMinorTickSpacing(2);
+        opacitySlider.setBorder(BorderFactory.createEmptyBorder(0, -5, 0, -5));
+        opacitySlider.setPaintTicks(false);
+        opacitySlider.setPaintLabels(false);
+        opacitySlider.setSnapToTicks(true);
+        opacitySlider.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                updateOpacity();
+            }
+        });
+        opacityLabel = new JLabel("Opacity:");
+        opacityValueLabel = new JLabel();
+
+        usePicturesButton = new JCheckBox("pics");
+        usePicturesButton.setMnemonic(KeyEvent.VK_P);
+        usePicturesButton.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                usePictures = usePicturesButton.isSelected();
+            }
+        });
+
+        // Table
+        model = new MyTableModel();
+        table = new JTable(model);
+        model.addColumn("#");
+        model.addColumn("QC");
+        model.addColumn("Subject");
+        model.addColumn("Comments");
+        model.addTableModelListener(new TableModelListener() {
+            public void tableChanged(TableModelEvent e) {
+                if (e.getColumn() >= 0)
+                    setTableChanged(true);
+            }
+        });
+        table.setCellSelectionEnabled(true);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setPreferredScrollableViewportSize(new Dimension(250, 70));
+        table.setFillsViewportHeight(true);
+        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting())
+                    selectSubject(table);
+            }
+        });
+        JScrollPane scrollPane = new JScrollPane(table);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+        table.getColumnModel().getColumn(0).setMinWidth(32);
+        table.getColumnModel().getColumn(1).setMinWidth(32);
+        table.getColumnModel().getColumn(2).setPreferredWidth(800);
+        table.getColumnModel().getColumn(3).setPreferredWidth(800);
+
+        // Graphs
+        graphs = new MyGraphs();
+        graphs.setPreferredSize(new Dimension(250, 250));
+
+        // Image
+        images = new MyImages();
+        JScrollPane imagesScrollPane = new JScrollPane(images);
+
+        updateZoom();
+        updateOpacity();
+
+        // Split Pane for Table and Graphs
+        JSplitPane splitPaneForTableAndGraphs = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrollPane, graphs);
+        splitPaneForTableAndGraphs.setOneTouchExpandable(true);
+        splitPaneForTableAndGraphs.setDividerLocation(350);
+        splitPaneForTableAndGraphs.setResizeWeight(1.0);
+
+        // Split Pane for the previous and Images
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitPaneForTableAndGraphs,
+                imagesScrollPane);
+        splitPane.setOneTouchExpandable(true);
+        splitPane.setDividerLocation(350);
+
+        // Layout the GUI
+        GroupLayout layout = new GroupLayout(f.getContentPane());
+        f.getContentPane().setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        layout.setHorizontalGroup(layout.createParallelGroup()
+                .addGroup(layout.createSequentialGroup().addComponent(chooseButton).addComponent(loadButton)
+                        .addComponent(saveButton).addComponent(zoomLabel).addComponent(zoomSlider, 50, 100, 100)
+                        .addComponent(zoomValueLabel).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 15, 15)
+                        .addComponent(opacityLabel).addComponent(opacitySlider, 50, 100, 100)
+                        .addComponent(opacityValueLabel).addComponent(usePicturesButton)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE,
+                                Short.MAX_VALUE)
+                        .addComponent(positionLabel))
+                .addComponent(splitPane).addComponent(status, GroupLayout.Alignment.LEADING));
+        layout.setVerticalGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER).addComponent(chooseButton)
+                        .addComponent(loadButton).addComponent(saveButton).addComponent(zoomLabel)
+                        .addComponent(zoomSlider).addComponent(zoomValueLabel).addComponent(opacityLabel)
+                        .addComponent(opacitySlider).addComponent(opacityValueLabel).addComponent(usePicturesButton)
+                        .addComponent(positionLabel))
+                .addComponent(splitPane).addComponent(status, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE,
+                        GroupLayout.PREFERRED_SIZE));
+        f.pack();
+        f.setVisible(true);
+    }
+
+    public static void main(String[] args) throws NumberFormatException, IOException, ConfigurationException {
+
+        if (args.length == 2) {
+            File configFile = new File(args[0]);
+            loadConfiguration(configFile);
+            File dir = new File(args[1]);
+            images = new MyImages(dir);
+            // images.changeSubjectDir(dir.getPath(), true);
+        } else {
+            new QCApp();
+            createAndShowGUI();
+        }
+    }
 }
