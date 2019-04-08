@@ -444,7 +444,7 @@ public class QCApp {
 				    	System.exit(0);
 				} else {
 			        int ans = JOptionPane.showConfirmDialog(f, 
-			                "Are you sure to close this window?", "Really Closing?", 
+			                "Are you sure you want to close this window?", "Really Close?", 
 			                JOptionPane.YES_NO_OPTION,
 			                JOptionPane.QUESTION_MESSAGE);
 			        if (ans == JOptionPane.YES_OPTION)

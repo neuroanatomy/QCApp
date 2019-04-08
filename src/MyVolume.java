@@ -8,7 +8,7 @@ import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Arrays;
-import java.util.Date;
+// import java.util.Date;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPInputStream;
 
@@ -23,10 +23,10 @@ class MyVolume {
 	float[] pixdim = new float[3]; 			// 3d volume pixel dimensions
 	short datatype; 						// 3d volume data type
 	int[][] boundingBox = new int[2][6]; 	// 3d volume bounding box
-	float[][] R = new float[3][3]; 			// coordinate systems matrix
+	float[][] R = new float[3][4]; 			// coordinate systems matrix
 	
 	//int maxval;
-	boolean redim;
+	boolean color;
 
 	File file;
 	ByteOrder BYTE_ORDER;
@@ -101,6 +101,9 @@ class MyVolume {
 		R[0][2] = bb.getFloat(66);
 		R[1][2] = bb.getFloat(70);
 		R[2][2] = bb.getFloat(74);
+		R[0][3] = bb.getFloat(78);
+		R[1][3] = bb.getFloat(82);
+		R[2][3] = bb.getFloat(86);
 
 		loadVolume(dis);
 //
@@ -225,10 +228,10 @@ class MyVolume {
 		float maxval = values2[(int)(dim[0]*dim[1]*dim[2]*.98)];
 		
 		// Convert values from int to byte for using less memory
-		if (redim)
-			mult = 255 / maxval;
-		else
+		if (color)
 			mult = 1;
+		else
+			mult = 255 / maxval;
 //
 //		currentDate = new Date();      
 //        System.out.println(currentDate.getTime() + " - 2nd loop");
@@ -317,10 +320,10 @@ class MyVolume {
 			return 0;
 	}
 
-	public MyVolume(File file, boolean redim) {
+	public MyVolume(File file, boolean color) {
 		InputStream is = null;
 		this.file = file;
-		this.redim = redim;
+		this.color = color;
 		String fileName = file.getPath();
 //        
 //		Date currentDate = new Date();      
