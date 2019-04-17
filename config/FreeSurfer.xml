@@ -28,8 +28,8 @@
     	<measures>
     		<measure>BrainSeg</measure>
     		<measure>eTIV</measure>
-    		<measure>CortexVol</measure>
-    		<measure>CorticalWhiteMatter</measure>
+    		<measure>Cortex</measure>
+    		<measure>CerebralWhiteMatter</measure>
     	</measures>
     </stats>
     <qcfile>qc-fs.txt</qcfile>
