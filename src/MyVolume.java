@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.util.Arrays;
 // import java.util.Date;
 import java.util.stream.IntStream;
@@ -169,13 +167,13 @@ class MyVolume {
     }
 
     void loadVolume(DataInputStream dis) throws IOException {
+        byte[] b;
         ByteBuffer bb;
         float mult;
 
-        ReadableByteChannel chan = Channels.newChannel(dis);
-        bb = ByteBuffer.allocate(dim[0] * dim[1] * dim[2] * bytesPerVoxel());
-        chan.read(bb);
-        bb.rewind();
+        b = new byte[dim[0] * dim[1] * dim[2] * bytesPerVoxel()];
+        dis.readFully(b);
+        bb = ByteBuffer.wrap(b);
         bb.order(BYTE_ORDER);
 
         int size = dim[0] * dim[1] * dim[2];
@@ -201,7 +199,6 @@ class MyVolume {
             return;
         }
         values = ist.toArray();
-        chan.close();
 
         int[] values2 = Arrays.copyOf(values, values.length);
 

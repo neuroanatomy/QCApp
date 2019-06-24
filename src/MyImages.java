@@ -44,7 +44,7 @@ class MyImages extends JComponent {
     private int prevPlane;
     private double prevHeight;
     private double scale;
-    private File subjectDir;
+    public File subjectDir;
     MyImage[] imgList;
     int margin = 5; // margin for images in pixels
     private BufferedImage bufImg0; // single view bitmap image
@@ -62,6 +62,7 @@ class MyImages extends JComponent {
             { 1, 0, 0 }, { 0, -1, 0 }, { 0, 0, 1 } };
 
     MyVolumes volumes;
+    Thread thread;
 
     public MyImages(File subjectDir) {
         this();
@@ -149,6 +150,9 @@ class MyImages extends JComponent {
         int dim1[] = new int[3];
         int[][] bounds = new int[3][2];
         // float[][] invS = new float[3][3];
+        
+        if (thread != null && thread.isAlive())
+                thread.interrupt();
 
         this.subjectDir = subjectDir;
         MyVolume vol = volumes.getVolume(new File(subjectDir, imgList[refImage].volName), imgList[refImage].color);
@@ -924,6 +928,9 @@ class MyImages extends JComponent {
         repaint();
         updatePositionLabel();
         initialized = true;
+        
+        thread = new MyThread();
+        thread.start();
 
         return err;
     }

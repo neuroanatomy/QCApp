@@ -60,7 +60,7 @@ import org.apache.commons.configuration2.tree.ImmutableNode;
 
 public class QCApp {
 
-    static private class MyTableModel extends DefaultTableModel {
+    static public class MyTableModel extends DefaultTableModel {
 
         private static final long serialVersionUID = -3092232013219096243L;
 
@@ -83,11 +83,11 @@ public class QCApp {
     private static JButton saveButton;
     private static JComboBox<String> configList;
     private static JLabel configListLabel;
-    private static JTable table;
-    private static MyTableModel model;
-    private static MyImages images;
+    public static JTable table;
+    public static MyTableModel model;
+    public static MyImages images;
     private static MyGraphs graphs;
-    private static File subjectsDir;
+    public static File subjectsDir;
     private static String colorLUTFile;
     private static List<File> configFiles;
     private static Path configDir;
@@ -112,7 +112,6 @@ public class QCApp {
     public static List<RegionColor> colorLUT;
     public static List<HierarchicalConfiguration<ImmutableNode>> imageConfigs;
 
-    public static Object imagesMap;
     public static String statsFileName;
     public static String[] measures;
 
