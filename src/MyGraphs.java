@@ -50,12 +50,14 @@ class MyGraphs extends JComponent {
         for (i = 0; i < NB_REGIONS; i++) {
             if (selectedSubjectVolumes[i] != 0) {
                 val = (float) ((selectedSubjectVolumes[i] - mean[i]) / (2.0 * std[i]));
+                if (val < -1)
+                    val = -1;
+                if (val > 1)
+                    val = 1;
                 if (val >= 0 && val <= 1)
                     g2.setColor(new Color(val, 1.0f - val, 0.0f));
-                else if (val >= -1 && val < 0)
-                    g2.setColor(new Color(0.0f, 1.0f + val, -val));
                 else
-                    g2.setColor(Color.white);
+                    g2.setColor(new Color(0.0f, 1.0f + val, -val));
             } else
                 g2.setColor(Color.white);
             g2.fillRect(x[i][0], 0, x[i][1], dim.height);
@@ -67,7 +69,7 @@ class MyGraphs extends JComponent {
         g2.setColor(Color.black);
         for (i = 0; i < NB_REGIONS; i++)
             if (selectedSubjectVolumes[i] != 0) {
-                val = (float) (0.5f + (selectedSubjectVolumes[i] - mean[i]) / (2.0 * std[i]) / 2.0);
+                val = (float) (0.5f + (selectedSubjectVolumes[i] - mean[i]) / (4.0 * std[i]));
                 if (val < 0)
                     val = 0;
                 if (val > 1)
