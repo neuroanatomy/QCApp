@@ -929,8 +929,10 @@ class MyImages extends JComponent {
         updatePositionLabel();
         initialized = true;
         
-        thread = new MyThread();
-        thread.start();
+        if (QCApp.table != null) {
+            thread = new MyThread();
+            thread.start();
+        }
 
         return err;
     }

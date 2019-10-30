@@ -199,8 +199,6 @@ public class QCApp {
         }
 
         // Detect configuration files
-        configDir = Paths.get(QCApp.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent()
-                .resolve("config");
         configFiles = Files.list(configDir).filter(Files::isRegularFile)
                 .filter(path -> path.toString().endsWith(".xml")).map(Path::toFile)
                 .sorted(Comparator.comparing(file -> file.getName().substring(0, file.getName().length() - 4)))
@@ -609,7 +607,8 @@ public class QCApp {
     }
 
     public static void main(String[] args) throws NumberFormatException, IOException, ConfigurationException {
-
+        configDir = Paths.get(QCApp.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent()
+                .resolve("config");
         if (args.length == 2) {
             File configFile = new File(args[0]);
             loadConfiguration(configFile);
@@ -619,6 +618,7 @@ public class QCApp {
         } else {
             new QCApp();
             createAndShowGUI();
+            System.out.println("off");
         }
     }
 }
