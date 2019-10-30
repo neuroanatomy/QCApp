@@ -48,32 +48,30 @@ class MyGraphs extends JComponent {
         // draw brain structure bars, with colours depending on selected-subject
         // values
         for (i = 0; i < NB_REGIONS; i++) {
-            if (selectedSubjectVolumes[i] != 0) {
-                val = (float) ((selectedSubjectVolumes[i] - mean[i]) / (2.0 * std[i]));
-                if (val >= 0 && val <= 1)
-                    g2.setColor(new Color(val, 1.0f - val, 0.0f));
-                else if (val >= -1 && val < 0)
-                    g2.setColor(new Color(0.0f, 1.0f + val, -val));
-                else
-                    g2.setColor(Color.white);
-            } else
-                g2.setColor(Color.white);
+        	if (mean[i] == 0)
+        		continue;
+            val = (float) ((selectedSubjectVolumes[i] - mean[i]) / (2.0 * std[i]));
+            if (val < -1)
+                val = -1;
+            if (val > 1)
+                val = 1;
+            if (val >= 0 && val <= 1)
+                g2.setColor(new Color(val, 1.0f - val, 0.0f));
+            else
+                g2.setColor(new Color(0.0f, 1.0f + val, -val));
             g2.fillRect(x[i][0], 0, x[i][1], dim.height);
             g2.setColor(Color.black);
             g2.drawRect(x[i][0], 0, x[i][1], dim.height);
-        }
 
-        // draw dots for selected subject values
-        g2.setColor(Color.black);
-        for (i = 0; i < NB_REGIONS; i++)
-            if (selectedSubjectVolumes[i] != 0) {
-                val = (float) (0.5f + (selectedSubjectVolumes[i] - mean[i]) / (2.0 * std[i]) / 2.0);
-                if (val < 0)
-                    val = 0;
-                if (val > 1)
-                    val = 1;
-                g2.fillOval((x[i][0] + x[i][1]) / 2 - 5, (int) (dim.height * (1 - val)) - 5, 11, 11);
-            }
+	        // draw dots for selected subject values
+	        g2.setColor(Color.black);
+            val = (float) (0.5f + (selectedSubjectVolumes[i] - mean[i]) / (4.0 * std[i]));
+            if (val < 0)
+                val = 0;
+            if (val > 1)
+                val = 1;
+            g2.fillOval((x[i][0] + x[i][1]) / 2 - 5, (int) (dim.height * (1 - val)) - 5, 11, 11);
+        }
 
         // draw mean and +/- 1 std values
         g2.setColor(Color.black);
